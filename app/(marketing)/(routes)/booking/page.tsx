@@ -1,12 +1,9 @@
 "use client";
 
 import { Fragment, forwardRef, useEffect, useState } from 'react'
-import { Listbox, Dialog, Transition, Menu } from '@headlessui/react'
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, updateDoc, where } from 'firebase/firestore'
 import { auth, db } from '@/src/index.ts'
 import { add, addDays, addHours, addMinutes, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, endOfDay, endOfMonth, endOfWeek, format, formatDistance, getDay, isBefore, isEqual, isSameDay, isSameMonth, isSameSecond, parse, parseISO, set, startOfDay, startOfWeek, toDate } from 'date-fns';
-import Services from '../../_components/services';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 
