@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '../../src/index.ts'
 import { useRouter } from 'next/navigation';
 import Sidebar from './_components/sidebar.tsx';
 import Image from 'next/image.js';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { BackgroundGradientAnimation } from '../(marketing)/_components/background-gradient-animation.tsx';
 
 export default function MainLayout({
   children,
