@@ -20,7 +20,7 @@ function classNames(...classes) {
   ]
 
 const BookingPage = () => {
-  // auth.languageCode = 'it';
+  auth.languageCode = 'it';
 
   // const [Otp, setOtp] = useState('');
   // const [confirmationResult,setConfirmationResult] = useState(null);
