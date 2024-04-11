@@ -103,6 +103,7 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
     const today = startOfDay(new Date());
     const [selectedDay, setSelectedDay] = useState(today);
     const [currentMonth, setCurrentMonth] = useState(format(today,'MMM-yyyy'));
+    
     let firstDayCurrentMonth = parse(currentMonth, 'MMM-yyyy', new Date())
 
     function changeSelectedDay(day: string) {
