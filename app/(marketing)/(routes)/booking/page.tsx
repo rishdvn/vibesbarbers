@@ -580,7 +580,7 @@ const BookingPage = () => {
 
                     <div className='flex flex-row w-full overflow-x-auto border-b border-gray-200 pb-2 gap-x-4'>
                         {twoWeekInterval.map((dayObject) => (
-                            <DayItem  day={dayObject} />
+                            <DayItem key={dayObject.day} day={dayObject} />
                         ))}
                     </div>
                 </div>

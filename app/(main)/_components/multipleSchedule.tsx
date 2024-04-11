@@ -2,14 +2,13 @@
 
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid'
-import { Menu, MenuButton, MenuItems, Transition } from '@headlessui/react'
+import { Menu } from '@headlessui/react'
 import { add, addDays, addHours, addMinutes, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, endOfDay, endOfMonth, endOfWeek, format, formatDistance, getDay, isEqual, isSameDay, isSameMonth, parse, parseISO, set, startOfDay, startOfWeek } from 'date-fns';
 import { collection, onSnapshot, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src';
 import { useUserAuth } from '@/src/context/AuthContext';
 import AddAppointment from './addappointment';
 import AddBreak from './addbreak';
-import CancelAppointment from './cancelappointment';;
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -814,7 +813,7 @@ export default function MultipleSchedule() {
                     }}
                   >
                     {dayTiming.map((time) => (
-                      <TimeRow time={time}/>
+                      <TimeRow key={time} time={time}/>
                     ))}
                   </div>
                 </div>
@@ -867,7 +866,7 @@ export default function MultipleSchedule() {
                         >
                           {barberAppsNoExtras.map((appointment) =>
                             { 
-                              return (<CalendarItem appointmentObject={appointment} color={barberColor}/>)
+                              return (<CalendarItem key={appointment.appDetails.appStartTime} appointmentObject={appointment} color={barberColor}/>)
                           }
                           )}
                         </ol>
@@ -888,7 +887,7 @@ export default function MultipleSchedule() {
                             className='flex flex-col gap-y-2 text-xs'
                           >
                             {barberExtras.map((app) => (
-                              <ExtraItem appointment={app} color={barberColor}/>
+                              <ExtraItem key={app.appDetails.appStartTime} appointment={app} color={barberColor}/>
                             ))}
                             {/* {barberExtras.map((app) => (
                               <div
