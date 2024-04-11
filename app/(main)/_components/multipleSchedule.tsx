@@ -170,7 +170,7 @@ export default function MultipleSchedule() {
       }
     }
 
-  },[rosters, selectedDay, users, appointments, selectedDayApps, view])
+  },[rosters, selectedDay, users, appointments, selectedDayApps, view, user])
 
   const times: { [key: string]: string[] } = {
     "monday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'],

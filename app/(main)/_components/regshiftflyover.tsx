@@ -306,6 +306,8 @@ export default function RegFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOverO
       setFlyOverOpen(false);
     }
 
+    const today = startOfDay(new Date());
+
     // if leave without saving chnages, or change user
     useEffect(() => {
         setSelectedTime({
@@ -319,8 +321,8 @@ export default function RegFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOverO
           "start": null,
           "end": null
         });
-        setIsBeforeDay(today);
-        setStartSelectedDay(today);
+        setIsBeforeDay(startOfDay(new Date()));
+        setStartSelectedDay(startOfDay(new Date()));
         setOverlapAction([]);
         
       }, [flyOverOpen]);
@@ -328,7 +330,7 @@ export default function RegFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOverO
     
     {/* 2. CALENDARS */}
 
-    const today = startOfDay(new Date());
+
     const [startSelectedDay, setStartSelectedDay] = useState(today);
     const [startCurrentMonth, setStartCurrentMonth] = useState(format(today,'MMM-yyyy'));
     let startFirstDayCurrentMonth = parse(startCurrentMonth, 'MMM-yyyy', new Date())
@@ -437,6 +439,8 @@ export default function RegFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOverO
     </div>
   )) 
 
+  StartCalendar.displayName = 'StartCalendar';
+
     // END CALENDAR DAY
 
     const [endSelectedDay, setEndSelectedDay] = useState(today);
@@ -539,6 +543,8 @@ export default function RegFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOverO
         </div>
       </div>
     )) 
+
+    EndCalendar.displayName = 'EndCalendar';
 
   const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 

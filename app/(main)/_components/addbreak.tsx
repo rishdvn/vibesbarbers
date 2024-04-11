@@ -148,7 +148,7 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
         }
         setBarberExistingApps(tempBarberExistingApps);          
       }
-    }, [appDetails])
+    }, [appDetails, appointments])
 
     // find possible appointment times for the day
     useEffect(() => {
@@ -303,7 +303,7 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
         end: endOfWeek(endOfMonth(firstDayCurrentMonth))
       }))
     },[currentMonth])
-
+    
   const Calendar = forwardRef((props, ref) => (
     <div ref={ref}>
       <div className="p-2">
@@ -412,6 +412,8 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
     </div>
   ))
 
+  Calendar.displayName = 'Calendar';
+
   // Create a app details object that dynamically stores
   const handleServiceChange = (service) => {
     setAppDetails(prev => ({...prev, service: service.title}));
@@ -432,8 +434,8 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
       appStartTime: "",
       appEndTime: ""
     })
-    setSelectedDay(today);
-    setCurrentMonth(format(today,'MMM-yyyy'));
+    setSelectedDay(startOfDay(new Date()));
+    setCurrentMonth(format(startOfDay(new Date()),'MMM-yyyy'));
     setAppointmentTimes(null);
   },[flyOverOpen])
 

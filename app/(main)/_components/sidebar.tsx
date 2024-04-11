@@ -62,7 +62,7 @@ export default function Sidebar({children}:{children:ReactNode}) {
         ])
       }
     }
-  },[userProfile])
+  },[userProfile, pathNameSlice])
 
   const pageIndex = navItems.findIndex((item) => item.href === pathName);
   

@@ -107,7 +107,7 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
 
     {/* 2. CALENDARS + APPOINTMENTS */}
 
-    const today = startOfDay(new Date());
+    const [today, setToday] = useState(startOfDay(new Date()));
     const [selectedDay, setSelectedDay] = useState(today);
     const [currentMonth, setCurrentMonth] = useState(format(today,'MMM-yyyy'));
     let firstDayCurrentMonth = parse(currentMonth, 'MMM-yyyy', new Date())
@@ -289,6 +289,7 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
         end: endOfWeek(endOfMonth(firstDayCurrentMonth))
       }))
     },[currentMonth])
+    // come back
 
   const Calendar = forwardRef((props, ref) => (
     <div ref={ref}>
@@ -398,6 +399,8 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
     </div>
   ))
 
+  Calendar.displayName = 'Calendar'
+
   // Create a app details object that dynamically stores
   function handleAppDetails(e) {
     setAppDetails(prev => ({...prev, [e.target.name]: e.target.value}))
@@ -423,8 +426,8 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
       appEndTime: "",
       isExtra: false
     })
-    setSelectedDay(today);
-    setCurrentMonth(format(today,'MMM-yyyy'));
+    setSelectedDay(new Date());
+    setCurrentMonth(format(new Date(),'MMM-yyyy'));
     setAppointmentTimes(null);
   },[flyOverOpen])
 

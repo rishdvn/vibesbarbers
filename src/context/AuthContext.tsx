@@ -46,7 +46,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode}) 
   
       // Cleanup subscription on unmount
       return () => unsubscribe();
-  },[])
+  },[router, pathName])
 
   // Create userProfile state
   const [userProfile, setUserProfile] = useState(null);
