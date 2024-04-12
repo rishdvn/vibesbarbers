@@ -244,7 +244,7 @@ export default function MultipleSchedule() {
                 key={appStart}
                 className={classNames(
                   "z-40 cursor-pointer group absolute inset-1 flex flex-col rounded-lg p-1 text-xs leading-5",
-                  isBreak ? "bg-black" : (priceExists ? completed : toDo)
+                  isBreak ? "bg-black" : (priceExists ? "bg-pink-200" : "bg-pink-100")
                 )}
               >
                 <div
@@ -478,7 +478,7 @@ export default function MultipleSchedule() {
                 key={appService + Math.random()}
                 className={classNames(
                   "h-24 cursor-pointer group flex flex-1 flex-col rounded-lg p-1 text-xs leading-5",
-                  priceExists ? completed : toDo
+                  priceExists ? "bg-pink-200": "bg-pink-100"
                 )}
               >
                 <div
