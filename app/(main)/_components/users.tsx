@@ -81,7 +81,7 @@ function classNames(...classes) {
                             <p
                               className="text-white font-medium text-2xl"
                             >
-                              {`${user ? user.firstname[0] : ""}`}
+                              {`${user && user.firstname ? user.firstname[0] : ""}`}
                             </p>
                           </div>
                           <div className="ml-4">
