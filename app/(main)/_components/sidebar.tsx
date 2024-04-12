@@ -86,10 +86,10 @@ export default function Sidebar({children}:{children:ReactNode}) {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row lg:py-0.5 lg:pr-0.5 h-full bg-gray-200"
+    <div className="z-50 flex flex-col lg:flex-row lg:py-0.5 lg:pr-0.5 h-full bg-gray-200"
     >
       <Transition.Root show={sidebarOpen} as={Fragment}>
-          <Dialog as="div" className="relative z-5 lg:hidden" onClose={setSidebarOpen}>
+          <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
             <Transition.Child
               as={Fragment}
               enter="transition-opacity ease-linear duration-300"
@@ -102,7 +102,7 @@ export default function Sidebar({children}:{children:ReactNode}) {
               <div className="fixed inset-0 bg-gray-900/80" />
             </Transition.Child>
 
-            <div className="fixed inset-0 flex">
+            <div className="z-50 fixed inset-0 flex">
               <Transition.Child
                 as={Fragment}
                 enter="transition ease-in-out duration-300 transform"
