@@ -401,7 +401,7 @@ export default function TeamFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOver
                                   onClick={() => handleColorChange(color)}
                                   key={color}
                                   className={classNames(
-                                    `h-12 w-12 border-2 bg-${color}-200 border-${color}-300 rounded-lg cursor-pointer`,
+                                    `h-12 w-12 border-2 bg-${color}-200 rounded-lg cursor-pointer`,
                                     userCredentials.color === color ? "ring-2 ring-offset-1 ring-gray-300" : ""
                                   )}
                                 ></div>

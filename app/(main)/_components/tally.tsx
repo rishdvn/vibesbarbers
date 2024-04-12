@@ -208,12 +208,14 @@ export default function TallyPage() {
         setTallyData(tempTallyData)
     },[tallys, selectedDay])
 
-    console.log("tallyData")
-    console.log(tallyData)
-
     //isEditing states
     const [isEditingEftpos, setIsEditingEftpos] = useState(false);
     const [isEditingCash, setIsEditingCash] = useState(false);
+
+    useEffect(() => {
+        setIsEditingEftpos(false);
+        setIsEditingCash(false);
+    },[selectedDay])
 
     async function handleTallySubmit() {
         if (tallyData.id) {
