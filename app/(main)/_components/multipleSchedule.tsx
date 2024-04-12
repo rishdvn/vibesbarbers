@@ -187,6 +187,8 @@ export default function MultipleSchedule() {
   const CalendarItem = ({appointmentObject, color}) => {
     const appointment= appointmentObject;
     const tileColor = color ? color : "pink"
+    const completed = color ? `bg-${color}-200` : "bg-pink-200"
+    const toDo = color ? `bg-${color}-100` : "bg-pink-100"
     const dayStart = addHours(startOfDay(selectedDay),9)
     const appStart = appointment.appDetails.appStartTime.toDate()
     const appEnd = appointment.appDetails.appEndTime.toDate()
@@ -242,7 +244,7 @@ export default function MultipleSchedule() {
                 key={appStart}
                 className={classNames(
                   "z-40 cursor-pointer group absolute inset-1 flex flex-col rounded-lg p-1 text-xs leading-5",
-                  isBreak ? "bg-black" : (priceExists ? `bg-green-300` : `bg-${tileColor}-200`)
+                  isBreak ? "bg-black" : (priceExists ? completed : toDo)
                 )}
               >
                 <div
@@ -424,6 +426,8 @@ export default function MultipleSchedule() {
 
   const ExtraItem = ({appointment, color}) => {
     const tileColor = color ? color : "pink"
+    const completed = color ? `bg-${color}-200` : "bg-pink-200"
+    const toDo = color ? `bg-${color}-100` : "bg-pink-100"
     const dayStart = addHours(startOfDay(selectedDay),9)
     const appService = appointment.appDetails.service
     const customerName = appointment.appDetails.firstname
@@ -474,7 +478,7 @@ export default function MultipleSchedule() {
                 key={appService + Math.random()}
                 className={classNames(
                   "h-24 cursor-pointer group flex flex-1 flex-col rounded-lg p-1 text-xs leading-5",
-                  priceExists ? `bg-green-200` : `bg-${tileColor}-200`
+                  priceExists ? completed : toDo
                 )}
               >
                 <div
