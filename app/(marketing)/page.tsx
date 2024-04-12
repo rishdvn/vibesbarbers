@@ -27,10 +27,16 @@ const MarketingPage = () => {
                     LOGIN
                 </a>}
             </div>
-            <div className="flex-1 relative overflow-hidden">
-                <video autoPlay muted loop className="object-cover w-full brightness-75 md:-translate-y-1/3 lg:-translate-y-1/3">         
-                    <source src="/background.mp4" type="video/mp4"/>       
-                </video>
+            <div className="flex-1 relative overflow-hidden">                
+                {/* <video autoPlay muted loop className="object-cover w-full brightness-75 md:-translate-y-1/3 lg:-translate-y-1/3">         
+                    <source src="/background.mp4" type="video/mp4"/>    
+                </video> */}
+                <Image
+                    src="/vibes.png"
+                    width={1920}
+                    height={1080}
+                    className="object-cover brightness-75 md:-translate-y-1/3 lg:-translate-y-1/3 scale-x-[-1]"
+                />
                 <div className={`flex flex-row justify-center absolute bottom-0 left-0 w-full text-white`}>
                     <div className="flex w-full max-w-screen-lg px-2 py-4 justify-between items-end">
                         {/* Vibes info */}
@@ -64,12 +70,17 @@ const MarketingPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <button
+                        <Image
+                            src="/prices.png"
+                            width={270}
+                            height={200}
+                        />
+                        {/* <button
                             type="button"
                             className="rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black"
                         >
                             View prices
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>
