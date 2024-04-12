@@ -449,7 +449,7 @@ const BookingPage = () => {
                       Please take a screenshot for your reference.
                   </div>
                   <div className='flex text-sm font-medium text-gray-700'>
-                      Call us on +(03) 9363 1126 for cancellations or multiple booking requests. No shows will be penalised. 
+                      Call us on +(03) 9363 1126 for cancellations or multiple booking requests. Please arrive 5 minutes or you will be penalised.
                   </div>
                 </div>
               

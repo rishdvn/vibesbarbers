@@ -70,11 +70,11 @@ const MarketingPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <Image
+                        {/* <Image
                             src="/prices.png"
                             width={270}
                             height={200}
-                        />
+                        /> */}
                         {/* <button
                             type="button"
                             className="rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black"
