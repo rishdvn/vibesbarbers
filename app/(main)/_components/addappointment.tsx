@@ -199,9 +199,9 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
             const now = new Date();
     
             if (rosterStartTimeObject.period === "AM") {
-              rosterStartTime = add(selectedDay, {hours: Number(rosterStartTimeObject.hour), minutes: rosterStartTimeObject.min})
+              rosterStartTime = addMinutes(addHours(selectedDay, Number(rosterStartTimeObject.hour)),rosterStartTimeObject.min)
             } else {
-              rosterStartTime = add(selectedDay, {hours: Number(rosterStartTimeObject.hour) + 12, minutes: rosterStartTimeObject.min})
+              rosterStartTime = addMinutes(addHours(selectedDay, Number(rosterStartTimeObject.hour) + 12),rosterStartTimeObject.min)
             }
     
             if (rosterEndTimeObject.period === "AM") {
@@ -209,6 +209,8 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
             } else {
               rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour) + 12),rosterEndTimeObject.min)
             }
+
+            console.log(rosterStartTime, rosterEndTime)
     
             let potentialStartTimes = [];
             let time = rosterStartTime;

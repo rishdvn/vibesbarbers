@@ -254,18 +254,17 @@ export default function TallyPage() {
                         onClick={() => setSelectedDay(today)}
                         className={classNames(
                             isSameDay(selectedDay, today) ? "bg-gray-100 font-medium" : "",
-                            "hidden border-y border-gray-200 px-3 text-xs text-gray-900 hover:bg-gray-100 focus:relative sm:block",
+                            "border-y border-gray-200 px-3 h-full text-xs text-gray-900 hover:bg-gray-100 focus:relative",
                         )}
                         >
                             Today
                         </button>
                         <button
                         type="button"
-                        className="cursor-default hidden border-y border-gray-200 px-3 text-xs font-normal text-gray-900 focus:relative sm:block"
+                        className="cursor-default border-y border-gray-200 h-full px-3 text-xs font-normal text-gray-900 focus:relative"
                         >
                             {`${format(selectedDay, 'd MMM')}`}
                         </button>
-                        <span className="relative -mx-px h-5 w-px bg-gray-300 sm:hidden" />
                         <button
                         onClick={() => setSelectedDay(addDays(selectedDay, 1))
                         }
