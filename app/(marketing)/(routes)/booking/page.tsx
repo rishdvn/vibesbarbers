@@ -44,24 +44,26 @@ const BookingPage = () => {
     }
 
     const handleSendOtp = async (e) => {
-      try {
-        const formattedPhoneNumber = `+61${appDetails.telNo.replace(/\D/g, '')}`;
-        const confirmation = await signInWithPhoneNumber(auth, formattedPhoneNumber, window.recaptchaVerifier);
-        setConfirmationResult(confirmation);
-        setOtpSent(true);
-        alert('OTP has been sent');
-      } catch (error) {
+      const formattedPhoneNumber = `+61${appDetails.telNo.replace(/\D/g, '')}`;
+      signInWithPhoneNumber(auth, formattedPhoneNumber, window.recaptchaVerifier).then(
+        (confirmationResult) => {
+          setConfirmationResult(confirmationResult);
+          setOtpSent(true);
+          alert('OTP has been sent');
+        }
+      ).catch((error) => {
+        grecaptha.reset(window.recaptchaVerifier);
         console.error(error)
-      }
+      })
     };
 
     const handleOTPSubmit = async (e) => {
-      try {
-        await confirmationResult.confirm(otp);
-        setOtp('');
-      } catch (error) {
+      confirmationResult.confirm(otp).then((result) => {
+        const user = result.user;
+        console.log(user);
+      }).catch((error) => {
         console.error(error)
-      }
+      })
     }
 
 
@@ -692,13 +694,7 @@ const BookingPage = () => {
                           </div>
                         )}
                     </div>
-                    {
-                      !otpSent ? (
-                        <div>
-                          <div id="recaptcha-container" />
-                        </div>
-                      ) : null
-                    }
+                    <div id="recaptcha-container" />
                     {otpSent ? (
                       <div
                         className='flex flex-row gap-x-1'
@@ -710,14 +706,12 @@ const BookingPage = () => {
                           placeholder="Enter OTP"
                           className='block w-full rounded-lg border border-gray-200 px-1 py-2'
                         />
-                        {!otpSent ? null : (
-                          <div
-                            onClick={otpSent ? handleOTPSubmit : handleSendOtp}
-                            className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
-                          >
-                            {otpSent ? "Submit OTP" : "Send OTP"}
-                          </div>
-                        )}
+                        <div
+                          onClick={otpSent ? handleOTPSubmit : handleSendOtp}
+                          className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
+                        >
+                          {otpSent ? "Submit OTP" : "Send OTP"}
+                        </div>
                       </div>
                     ) : null}
                     <div
