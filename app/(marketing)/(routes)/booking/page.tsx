@@ -696,31 +696,39 @@ const BookingPage = () => {
                           </div>
                         )}
                     </div>
-                    {verified ? null :
-                      (otpSent ? (
+                    {!verified && !otpSent ? (
+                      <div id="recaptcha-container" />
+                    ) : null}
+                    {otpSent && !verified ? (
+                      <div
+                        className='flex flex-row gap-x-1'
+                      >
+                        <input
+                          type='text'
+                          value={otp}
+                          onChange={handleOTPChange}
+                          placeholder="Enter OTP"
+                          className='block w-full rounded-lg border border-gray-200 px-1 py-2'
+                        />
                         <div
-                          className='flex flex-row gap-x-1'
+                          onClick={handleOTPSubmit}
+                          className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
                         >
-                          <input
-                            type='text'
-                            value={otp}
-                            onChange={handleOTPChange}
-                            placeholder="Enter OTP"
-                            className='block w-full rounded-lg border border-gray-200 px-1 py-2'
-                          />
-                          <div
-                            onClick={handleOTPSubmit}
-                            className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
-                          >
-                            Submit OTP
-                          </div>
+                          Submit OTP
                         </div>
-                      ) : <div id="recaptcha-container" />)
-                    }
+                      </div>
+                    ) : null}
+                    {verified && (
+                      <div
+                        className='text-green-600 font-semibold'
+                      >
+                        Phone number verified
+                      </div>
+                    )}
                     <div
                         className='text-gray-600 font-medium'
                     >
-                        This is only for verification purposes. You will not be sent any marketing SMS.
+                        This is only for verification purposes. The barber will contact you on this number if they are sick. You will not be sent any marketing SMS, and this number will not be shared.
                     </div>
                     {
                         appDetails.telNo.length === 9 || appDetails.telNo.length === 0 ? "" : (
