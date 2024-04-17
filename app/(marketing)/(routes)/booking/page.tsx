@@ -160,7 +160,7 @@ const BookingPage = () => {
     } else {
       setAllowSubmit(true)
     }
-  },[appDetails])
+  },[appDetails, verified])
 
     {/* 2. CALENDARS + APPOINTMENTS */}
 
