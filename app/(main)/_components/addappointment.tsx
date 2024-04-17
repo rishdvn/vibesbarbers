@@ -303,7 +303,7 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
             <span className="sr-only">Previous month</span>
             <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
           </button>
-          <div className="flex-auto text-xs font-semibold">{format(currentMonth, 'MMMM yyyy')}</div>
+          <div className="flex-auto text-xs font-semibold">{currentMonth}</div>
           <button
             onClick={() => setCurrentMonth(format(add(firstDayCurrentMonth, {months: 1}), 'MMM-yyyy'))}
             type="button"
@@ -350,7 +350,7 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
                   // check if working
                   const dayWeekDay = format(day, 'iiii').toLowerCase()
                   if (rosterInfo[dayWeekDay].isWorking) {
-                    dayIsWorking = true;                    
+                    dayIsWorking = true;
                   } else {
                     dayIsWorking = false;
                   }

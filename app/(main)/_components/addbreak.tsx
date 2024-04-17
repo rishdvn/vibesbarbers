@@ -187,7 +187,7 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
           const now = new Date();
   
           if (rosterStartTimeObject.period === "AM") {
-            rosterStartTime = add(selectedDay, {hours: rosterStartTimeObject.hour, minutes: rosterStartTimeObject.min})
+            rosterStartTime = add(selectedDay, {hours: Number(rosterStartTimeObject.hour), minutes: rosterStartTimeObject.min})
           } else {
             rosterStartTime = add(selectedDay, {hours: Number(rosterStartTimeObject.hour) + 12, minutes: rosterStartTimeObject.min})
           }
@@ -317,7 +317,7 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
             <span className="sr-only">Previous month</span>
             <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
           </button>
-          <div className="flex-auto text-xs font-semibold">{format(currentMonth, 'MMMM yyyy')}</div>
+          <div className="flex-auto text-xs font-semibold">{currentMonth}</div>
           <button
             onClick={() => setCurrentMonth(format(add(firstDayCurrentMonth, {months: 1}), 'MMM-yyyy'))}
             type="button"
