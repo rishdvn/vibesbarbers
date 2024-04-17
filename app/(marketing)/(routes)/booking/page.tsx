@@ -56,10 +56,12 @@ const BookingPage = () => {
       })
     };
 
+    const [verified, setVerified] = useState(false)
+
     const handleOTPSubmit = async (e) => {
       confirmationResult.confirm(otp).then((result) => {
         const user = result.user;
-        console.log(user);
+        setVerified(true);
       }).catch((error) => {
         console.error(error)
       })
@@ -151,7 +153,8 @@ const BookingPage = () => {
       !(appDetails.telNo.length === 9) ||
       (/^\d+$/.test(appDetails.telNo) === false) ||
       appDetails.appDay === "" || 
-      (appDetails.isExtra === false && (appDetails.appStartTime === "" || appDetails.appEndTime === ""))
+      (appDetails.isExtra === false && (appDetails.appStartTime === "" || appDetails.appEndTime === "") ||
+      verified === false)
     ) {
       setAllowSubmit(false)
     } else {
@@ -686,33 +689,34 @@ const BookingPage = () => {
                         />
                         {otpSent ? null : (
                           <div
-                            onClick={otpSent ? handleOTPSubmit : handleSendOtp}
+                            onClick={handleSendOtp}
                             className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
                           >
-                            {otpSent ? "Submit OTP" : "Send OTP"}
+                            Send OTP
                           </div>
                         )}
                     </div>
-                    <div id="recaptcha-container" />
-                    {otpSent ? (
-                      <div
-                        className='flex flex-row gap-x-1'
-                      >
-                        <input
-                          type='text'
-                          value={otp}
-                          onChange={handleOTPChange}
-                          placeholder="Enter OTP"
-                          className='block w-full rounded-lg border border-gray-200 px-1 py-2'
-                        />
+                    {verified ? null :
+                      otpSent ? (
                         <div
-                          onClick={otpSent ? handleOTPSubmit : handleSendOtp}
-                          className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
+                          className='flex flex-row gap-x-1'
                         >
-                          {otpSent ? "Submit OTP" : "Send OTP"}
+                          <input
+                            type='text'
+                            value={otp}
+                            onChange={handleOTPChange}
+                            placeholder="Enter OTP"
+                            className='block w-full rounded-lg border border-gray-200 px-1 py-2'
+                          />
+                          <div
+                            onClick={handleOTPSubmit}
+                            className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
+                          >
+                            Submit OTP
+                          </div>
                         </div>
-                      </div>
-                    ) : null}
+                      ) : <div id="recaptcha-container" />
+                    }
                     <div
                         className='text-gray-600 font-medium'
                     >
