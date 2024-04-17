@@ -52,7 +52,6 @@ const BookingPage = () => {
           alert('OTP has been sent');
         }
       ).catch((error) => {
-        grecaptha.reset(window.recaptchaVerifier);
         console.error(error)
       })
     };
