@@ -697,7 +697,7 @@ const BookingPage = () => {
                         )}
                     </div>
                     {verified ? null :
-                      otpSent ? (
+                      (otpSent ? (
                         <div
                           className='flex flex-row gap-x-1'
                         >
@@ -715,7 +715,7 @@ const BookingPage = () => {
                             Submit OTP
                           </div>
                         </div>
-                      ) : <div id="recaptcha-container" />
+                      ) : <div id="recaptcha-container" />)
                     }
                     <div
                         className='text-gray-600 font-medium'
