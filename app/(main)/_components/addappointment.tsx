@@ -199,7 +199,7 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
             const now = new Date();
     
             if (rosterStartTimeObject.period === "AM") {
-              rosterStartTime = add(selectedDay, {hours: rosterStartTimeObject.hour, minutes: rosterStartTimeObject.min})
+              rosterStartTime = add(selectedDay, {hours: Number(rosterStartTimeObject.hour), minutes: rosterStartTimeObject.min})
             } else {
               rosterStartTime = add(selectedDay, {hours: Number(rosterStartTimeObject.hour) + 12, minutes: rosterStartTimeObject.min})
             }
@@ -722,7 +722,10 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
                                       <Menu.Items className="bg-white w-3/4 top-full mt-2 text-medium absolute left-0 z-50 origin-top-right divide-y divide-gray-200 border-gray-200 rounded-md border focus:outline-none">
                                         <div className="">
                                             <Menu.Item>
-                                              <Calendar />
+                                              <div>
+                                                Hello
+                                              </div>
+                                              {/* <Calendar /> */}
                                             </Menu.Item>
                                         </div>
                                       </Menu.Items>

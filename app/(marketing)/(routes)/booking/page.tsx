@@ -212,13 +212,13 @@ const BookingPage = () => {
             const rosterEndTimeObject = dayRoster[dayWeekDay].end_time;
             let rosterStartTime; 
             let rosterEndTime;
-  
+
             const now = new Date();
     
             if (rosterStartTimeObject.period === "AM") {
-              rosterStartTime = add(selectedDay, {hours: rosterStartTimeObject.hour, minutes: rosterStartTimeObject.min})
+              rosterStartTime = addMinutes(addHours(selectedDay, Number(rosterStartTimeObject.hour)),rosterStartTimeObject.min)
             } else {
-              rosterStartTime = add(selectedDay, {hours: Number(rosterStartTimeObject.hour) + 12, minutes: rosterStartTimeObject.min})
+              rosterStartTime = addMinutes(addHours(selectedDay, Number(rosterStartTimeObject.hour) + 12),rosterStartTimeObject.min)
             }
     
             if (rosterEndTimeObject.period === "AM") {
@@ -286,7 +286,7 @@ const BookingPage = () => {
                   }
                 }
               }
-            }  
+            }
             setAppointmentTimes(appointmentTimes);
           }
         }
