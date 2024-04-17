@@ -186,9 +186,6 @@ export default function MultipleSchedule() {
 
   const CalendarItem = ({appointmentObject, color}) => {
     const appointment= appointmentObject;
-    const tileColor = color ? color : "pink"
-    const completed = color ? `bg-${color}-200` : "bg-pink-200"
-    const toDo = color ? `bg-${color}-100` : "bg-pink-100"
     const dayStart = addHours(startOfDay(selectedDay),9)
     const appStart = appointment.appDetails.appStartTime.toDate()
     const appEnd = appointment.appDetails.appEndTime.toDate()
@@ -199,6 +196,25 @@ export default function MultipleSchedule() {
     const span = (differenceInMinutes(appEnd, appStart) / 20)
     const isBreak = appointment.appDetails.service === "20 Minute Break" || appointment.appDetails.service === "40 Minute Break" || appointment.appDetails.service === "60 Minute Break"
     const priceExists = appointment.service ? true : false
+    const tileColor = color ? color : "pink"
+    const colorCompleted = {
+      blue: 'bg-blue-200 ',
+      red: 'bg-red-200',
+      pink: 'bg-pink-200 ',
+      green: 'bg-green-200 ',
+      indigo: 'bg-indigo-200 ',
+      orange: 'bg-orange-200 ',
+      yellow: 'bg-yellow-200 ',
+    }
+    const colorTodo = {
+      blue: 'bg-blue-100',
+      red: 'bg-red-100',
+      pink: 'bg-pink-100',
+      green: 'bg-green-100',
+      indigo: 'bg-indigo-100',
+      orange: 'bg-orange-100',
+      yellow: 'bg-yellow-100',
+    }
 
     const appId = appointment.id;
 
@@ -244,7 +260,7 @@ export default function MultipleSchedule() {
                 key={appStart}
                 className={classNames(
                   "z-40 cursor-pointer group absolute inset-1 flex flex-col rounded-lg p-1 text-xs leading-5",
-                  isBreak ? "bg-black" : (priceExists ? "bg-pink-200" : "bg-pink-100")
+                  isBreak ? "bg-black" : (priceExists ? `${colorCompleted[color]}` : `${colorTodo[color]}`)
                 )}
               >
                 <div
@@ -425,15 +441,31 @@ export default function MultipleSchedule() {
   }
 
   const ExtraItem = ({appointment, color}) => {
-    const tileColor = color ? color : "pink"
-    const completed = color ? `bg-${color}-200` : "bg-pink-200"
-    const toDo = color ? `bg-${color}-100` : "bg-pink-100"
     const dayStart = addHours(startOfDay(selectedDay),9)
     const appService = appointment.appDetails.service
     const customerName = appointment.appDetails.firstname
     const customerTel = appointment.appDetails.telNo
     const isBreak = appointment.appDetails.service === "20 Minute Break" || appointment.appDetails.service === "40 Minute Break" || appointment.appDetails.service === "60 Minute Break"
     const priceExists = appointment.service ? true : false
+    const tileColor = color ? color : "pink"
+    const colorCompleted = {
+      blue: 'bg-blue-200 ',
+      red: 'bg-red-200',
+      pink: 'bg-pink-200 ',
+      green: 'bg-green-200 ',
+      indigo: 'bg-indigo-200 ',
+      orange: 'bg-orange-200 ',
+      yellow: 'bg-yellow-200 ',
+    }
+    const colorTodo = {
+      blue: 'bg-blue-100',
+      red: 'bg-red-100',
+      pink: 'bg-pink-100',
+      green: 'bg-green-100',
+      indigo: 'bg-indigo-100',
+      orange: 'bg-orange-100',
+      yellow: 'bg-yellow-100',
+    }
 
     const appId = appointment.id;
 
@@ -478,7 +510,7 @@ export default function MultipleSchedule() {
                 key={appService + Math.random()}
                 className={classNames(
                   "h-24 cursor-pointer group flex flex-1 flex-col rounded-lg p-1 text-xs leading-5",
-                  priceExists ? "bg-pink-200": "bg-pink-100"
+                  priceExists ? `${colorCompleted[color]}`: `${colorTodo[color]}`
                 )}
               >
                 <div

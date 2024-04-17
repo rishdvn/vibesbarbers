@@ -395,13 +395,22 @@ export default function TeamFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOver
                             Colour
                           </label>
                           <div className="grid grid-flow-col ">
-                            {["blue", "pink", "green", "indigo", "red", "orange", "yellow"].map((color) => {
+                            {["blue", "red", "pink", "green", "indigo", "orange", "yellow"].map((color) => {
+                                const colorVariants = {
+                                  blue: 'bg-blue-200 hover:bg-blue-300 border-blue-600',
+                                  red: 'bg-red-200 hover:bg-red-300 border-red-600',
+                                  pink: 'bg-pink-200 hover:bg-pink-300 border-pink-600',
+                                  green: 'bg-green-200 hover:bg-green-300 border-green-600',
+                                  indigo: 'bg-indigo-200 hover:bg-indigo-300 border-indigo-600',
+                                  orange: 'bg-orange-200 hover:bg-orange-300 border-orange-600',
+                                  yellow: 'bg-yellow-100 hover:bg-yellow-300 border-yellow-600',
+                                }
                               return (
                                 <div
                                   onClick={() => handleColorChange(color)}
                                   key={color}
                                   className={classNames(
-                                    `h-12 w-12 border-2 bg-${color}-200 rounded-lg cursor-pointer`,
+                                    `h-12 w-12 border-2 ${colorVariants[color]} rounded-lg cursor-pointer`,
                                     userCredentials.color === color ? "ring-2 ring-offset-1 ring-gray-300" : ""
                                   )}
                                 ></div>

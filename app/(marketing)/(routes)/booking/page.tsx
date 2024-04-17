@@ -17,23 +17,53 @@ function classNames(...classes) {
   ]
 
 const BookingPage = () => {
-  auth.languageCode = 'it';
+  auth.languageCode = 'en';
 
-  // const [Otp, setOtp] = useState('');
-  // const [confirmationResult,setConfirmationResult] = useState(null);
-  // const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [confirmationResult,setConfirmationResult] = useState(null);
+  const [otpSent, setOtpSent] = useState(false);
 
-  // useEffect(() => {
-  //   window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-  //     'size': 'invisible',
-  //     'callback': (response) => {
-  //       console.log(response)
-  //     },
-  //     'expired-callback': () => {
-  //       console.log('expired')
-  //     }
-  //   });
-  // }, [auth])
+  interface Window {
+    recaptchaVerifier?: any;
+}
+
+  useEffect(() => {
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      'size': 'normal',
+      'callback': (response) => {
+        console.log(response)
+      },
+      'expired-callback': () => {
+        console.log('expired')
+      }
+    });
+  }, [auth])
+
+    const handleOTPChange = (e) => {
+      setOtp(e.target.value);
+    }
+
+    const handleSendOtp = async (e) => {
+      try {
+        const formattedPhoneNumber = `+61${appDetails.telNo.replace(/\D/g, '')}`;
+        const confirmation = await signInWithPhoneNumber(auth, formattedPhoneNumber, window.recaptchaVerifier);
+        setConfirmationResult(confirmation);
+        setOtpSent(true);
+        alert('OTP has been sent');
+      } catch (error) {
+        console.error(error)
+      }
+    };
+
+    const handleOTPSubmit = async (e) => {
+      try {
+        await confirmationResult.confirm(otp);
+        setOtp('');
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
 
     {/* 0. FETCH RELEVANT DATA */}
     // fetch users, filter for barbers
@@ -653,7 +683,43 @@ const BookingPage = () => {
                           id="telNo"
                           className="block w-full rounded-md border-0 p-1 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-sky-600 sm: sm:leading-6"
                         />
+                        {otpSent ? null : (
+                          <div
+                            onClick={otpSent ? handleOTPSubmit : handleSendOtp}
+                            className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
+                          >
+                            {otpSent ? "Submit OTP" : "Send OTP"}
+                          </div>
+                        )}
                     </div>
+                    {
+                      !otpSent ? (
+                        <div>
+                          <div id="recaptcha-container" />
+                        </div>
+                      ) : null
+                    }
+                    {otpSent ? (
+                      <div
+                        className='flex flex-row gap-x-1'
+                      >
+                        <input
+                          type='text'
+                          value={otp}
+                          onChange={handleOTPChange}
+                          placeholder="Enter OTP"
+                          className='block w-full rounded-lg border border-gray-200 px-1 py-2'
+                        />
+                        {!otpSent ? null : (
+                          <div
+                            onClick={otpSent ? handleOTPSubmit : handleSendOtp}
+                            className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
+                          >
+                            {otpSent ? "Submit OTP" : "Send OTP"}
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
                     <div
                         className='text-gray-600 font-medium'
                     >

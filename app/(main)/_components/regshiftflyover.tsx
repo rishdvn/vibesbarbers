@@ -381,7 +381,7 @@ export default function RegFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOverO
             <span className="sr-only">Previous month</span>
             <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
           </button>
-          <div className="flex-auto text-xs font-semibold">{format(startCurrentMonth, 'MMMM yyyy')}</div>
+          <div className="flex-auto text-xs font-semibold">{startCurrentMonth}</div>
           <button
             onClick={nextMonth}
             type="button"
@@ -487,7 +487,7 @@ export default function RegFlyOver({flyOverOpen, setFlyOverOpen, user}:{flyOverO
             <span className="sr-only">Previous month</span>
             <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
           </button>
-          <div className="flex-auto text-xs font-semibold">{format(endCurrentMonth, 'MMMM yyyy')}</div>
+          <div className="flex-auto text-xs font-semibold">{endCurrentMonth}</div>
           <button
             onClick={endNextMonth}
             type="button"
