@@ -722,10 +722,7 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
                                       <Menu.Items className="bg-white w-3/4 top-full mt-2 text-medium absolute left-0 z-50 origin-top-right divide-y divide-gray-200 border-gray-200 rounded-md border focus:outline-none">
                                         <div className="">
                                             <Menu.Item>
-                                              <div>
-                                                Hello
-                                              </div>
-                                              {/* <Calendar /> */}
+                                              <Calendar />
                                             </Menu.Item>
                                         </div>
                                       </Menu.Items>
