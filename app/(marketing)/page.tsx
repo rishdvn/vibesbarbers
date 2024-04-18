@@ -5,6 +5,7 @@ import { StarIcon } from "@heroicons/react/20/solid";
 import ServicesLanding from "./_components/serviceslanding";
 import { useUserAuth } from "@/src/context/AuthContext";
 import { useState } from "react";
+import { Menu } from "@headlessui/react";
 
 
 const MarketingPage = () => {
@@ -15,17 +16,14 @@ const MarketingPage = () => {
         <div className="flex flex-col items-center h-full">
             <div className="flex w-full sm:px-2 py-1 justify-between items-center max-w-screen-lg">
                 <Image width={imageSize} height={imageSize} src="/black_logo_vibes.png" alt="logo" />
-                {user ? <a
-                    href="/calendar"
-                    className="mr-2 text-lg font-bold text-gray-800"
-                >
-                    Dashboard
-                </a> : <a
-                    href="/login"
-                    className="mr-2 text-lg font-bold text-gray-800"
-                >
-                    LOGIN
-                </a>}
+                {user ? (
+                    <div
+                        className="mr-2 text-lg font-bold text-gray-800"
+                    >
+                        {user.phoneNumber ? user.phoneNumber : user.email}
+                    </div>
+                )
+                : null}
             </div>
             <div className="flex-1 relative overflow-hidden">                
                 {/* <video autoPlay muted loop className="object-cover w-full brightness-75 md:-translate-y-1/3 lg:-translate-y-1/3">         

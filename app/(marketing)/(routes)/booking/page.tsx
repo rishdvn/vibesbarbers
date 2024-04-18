@@ -5,6 +5,7 @@ import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query,
 import { auth, db } from '@/src/index.ts'
 import { add, addDays, addHours, addMinutes, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, endOfDay, endOfMonth, endOfWeek, format, formatDistance, getDay, isBefore, isEqual, isSameDay, isSameMonth, isSameSecond, parse, parseISO, set, startOfDay, startOfWeek, toDate } from 'date-fns';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { useUserAuth } from '@/src/context/AuthContext';
 
 
 function classNames(...classes) {
@@ -17,6 +18,17 @@ function classNames(...classes) {
   ]
 
 const BookingPage = () => {
+  const { user, signUserOut } = useUserAuth();
+
+  const handleNumberChange = () => {
+    setOtpSent(false);
+    setVerified(false);
+    setAppDetails(prev => ({...prev, "telNo": ""}))
+    signUserOut();
+  }
+
+  console.log(user)
+
   auth.languageCode = 'en';
 
   const [otp, setOtp] = useState('');
@@ -66,7 +78,9 @@ const BookingPage = () => {
         console.error(error)
       })
     }
-
+    
+    console.log("captha?")
+    console.log(!verified && !otpSent)
 
     {/* 0. FETCH RELEVANT DATA */}
     // fetch users, filter for barbers
@@ -154,13 +168,22 @@ const BookingPage = () => {
       (/^\d+$/.test(appDetails.telNo) === false) ||
       appDetails.appDay === "" || 
       (appDetails.isExtra === false && (appDetails.appStartTime === "" || appDetails.appEndTime === "") ||
-      verified === false)
+      (user === null))
     ) {
       setAllowSubmit(false)
     } else {
       setAllowSubmit(true)
     }
-  },[appDetails, verified])
+  },[appDetails, verified, user])
+
+  useEffect(() => {
+    if (user && user.phoneNumber) {
+      const phoneNo = user.phoneNumber.slice(3)
+      setAppDetails(prev => ({...prev, "telNo": phoneNo}))
+    } else if (user && user.email) {
+      signUserOut();
+    }
+  },[user])
 
     {/* 2. CALENDARS + APPOINTMENTS */}
 
@@ -459,8 +482,6 @@ const BookingPage = () => {
     setAppDetails(prev => ({...prev, barberUID: barberObject.uid, appDay: "", appStartTime: "", appEndTime: ""}));
   }
 
-  console.log(appDetails)
-    
     return (
     <div className='h-full flex flex-col items-center'>
       {submited ? (
@@ -672,84 +693,102 @@ const BookingPage = () => {
 
                 {/* phone number */}
                 <div className="grid grid-cols-1 gap-1 space-y-0">
-                    <label
-                        className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
-                    >
-                        PHONE NUMBER
-                    </label>
-                    <div className="col-span-1 flex items-center gap-x-1">
-                        +61
-                        <input
-                          type="tel"
-                          value={appDetails.telNo}
-                          onChange={handleAppDetails}
-                          name="telNo"
-                          id="telNo"
-                          className="block w-full rounded-md border-0 p-1 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-sky-600 sm: sm:leading-6"
-                        />
-                        {otpSent ? null : (
-                          <div
-                            onClick={handleSendOtp}
-                            className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
-                          >
-                            Send OTP
-                          </div>
-                        )}
+                  <label
+                      className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
+                  >
+                      PHONE NUMBER
+                  </label>
+                  { user ? (
+                    <div className='flex flex-row justify-between py-2'>
+                      <div>
+                        {user.phoneNumber}
+                      </div>
+                      <div
+                        className='text-blue-800 hover:text-blue-700 font-medium cursor-pointer'
+                        onClick={() => {handleNumberChange()}}
+                      >
+                        Change number
+                      </div>
                     </div>
-                    {!verified && !otpSent ? (
-                      <div id="recaptcha-container" />
-                    ) : null}
-                    {otpSent && !verified ? (
-                      <div
-                        className='flex flex-row gap-x-1'
-                      >
-                        <input
-                          type='text'
-                          value={otp}
-                          onChange={handleOTPChange}
-                          placeholder="Enter OTP"
-                          className='block w-full rounded-lg border border-gray-200 px-1 py-2'
-                        />
-                        <div
-                          onClick={handleOTPSubmit}
-                          className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
-                        >
-                          Submit OTP
-                        </div>
+                  ) : (
+                    null
+                  )}
+                  { user ? null : (
+                    <div className='flex flex-col gap-y-2'>
+                      <div className="col-span-1 flex items-center gap-x-1">
+                          +61
+                          <input
+                            type="tel"
+                            value={appDetails.telNo}
+                            onChange={handleAppDetails}
+                            name="telNo"
+                            id="telNo"
+                            className="block w-full rounded-md border-0 p-1 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-sky-600 sm: sm:leading-6"
+                          />
+                          {otpSent ? null : (
+                            <div
+                              onClick={handleSendOtp}
+                              className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
+                            >
+                              Send OTP
+                            </div>
+                          )}
                       </div>
-                    ) : null}
-                    {verified && (
-                      <div
-                        className='text-green-600 font-semibold'
-                      >
-                        Phone number verified
-                      </div>
-                    )}
+                    </div>
+                  )}
+                  {!verified && !otpSent ? (
+                    <div id="recaptcha-container" />
+                  ) : null}
+                  {otpSent && !verified ? (
                     <div
-                        className='text-gray-600 font-medium'
+                      className='flex flex-row gap-x-1'
                     >
-                        This is only for verification purposes. The barber will contact you on this number if they are sick. You will not be sent any marketing SMS, and this number will not be shared.
+                      <input
+                        type='text'
+                        value={otp}
+                        onChange={handleOTPChange}
+                        placeholder="Enter OTP"
+                        className='block w-full rounded-lg border border-gray-200 px-1 py-2'
+                      />
+                      <div
+                        onClick={handleOTPSubmit}
+                        className="flex w-1/4 justify-center rounded-md bg-black p-2 text-md font-medium text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 cursor-pointer"
+                      >
+                        Submit OTP
+                      </div>
                     </div>
-                    {
-                        appDetails.telNo.length === 9 || appDetails.telNo.length === 0 ? "" : (
-                        <div
-                            className='text-red-600 font-medium'
-                        >
-                            Number must be 9 digits
-                        </div>
-                        )
-                    }
-                    {
-                        (/^\d+$/.test(appDetails.telNo) || appDetails.telNo.length === 0) ? "" : (
-                        <div
-                            className='text-red-600 font-medium'
-                        >
-                            Number must contian only numbers
-                        </div>
-                        )
-                    }
+                  ) : null}
+                  {verified && (
+                    <div
+                      className='text-green-600 font-semibold'
+                    >
+                      Phone number verified
+                    </div>
+                  )}
+                  <div
+                      className='text-gray-600 font-medium'
+                  >
+                      This is only for verification purposes. The barber will contact you on this number if they are sick. You will not be sent any marketing SMS, and this number will not be shared.
+                  </div>
+                  {
+                      appDetails.telNo.length === 9 || appDetails.telNo.length === 0 ? "" : (
+                      <div
+                          className='text-red-600 font-medium'
+                      >
+                          Number must be 9 digits
+                      </div>
+                      )
+                  }
+                  {
+                      (/^\d+$/.test(appDetails.telNo) || appDetails.telNo.length === 0) ? "" : (
+                      <div
+                          className='text-red-600 font-medium'
+                      >
+                          Number must contian only numbers
+                      </div>
+                      )
+                  }
                 </div>
-
             </div>
 
             {/* Action buttons */}
