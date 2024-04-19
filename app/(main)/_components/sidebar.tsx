@@ -197,11 +197,11 @@ export default function Sidebar({children}:{children:ReactNode}) {
                               <p
                                 className="text-white font-medium text-md"
                               >
-                                {`${userProfile ? userProfile.firstname[0]: ""}`}
+                                {`${userProfile && userProfile.firstname ? userProfile.firstname[0]: ""}`}
                               </p>
                             </div>
                             <span className="sr-only">Your profile</span>
-                            <span className="hover:text-gray-900" aria-hidden="true">{`${userProfile ? userProfile.firstname  : ""}`}</span>
+                            <span className="hover:text-gray-900" aria-hidden="true">{`${userProfile && userProfile.firstname ? userProfile.firstname  : ""}`}</span>
                           </div>
                           <div
                             className="text-medium"
@@ -289,11 +289,11 @@ export default function Sidebar({children}:{children:ReactNode}) {
                         <p
                           className="text-white font-medium text-md"
                         >
-                          {`${userProfile ? userProfile.firstname[0] : ""}`}
+                          {`${userProfile && userProfile.firstname ? userProfile.firstname[0] : ""}`}
                         </p>
                       </div>
                       <span className="sr-only">Your profile</span>
-                      <span className="hover:text-gray-900" aria-hidden="true">{`${userProfile ? userProfile.firstname : ""} ${userProfile ? userProfile.lastname: ""}`}</span>
+                      <span className="hover:text-gray-900" aria-hidden="true">{`${userProfile && userProfile.firstname ? userProfile.firstname : ""} ${userProfile ? userProfile.lastname: ""}`}</span>
                     </a>
                   </div>
               </Menu.Button>
