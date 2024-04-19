@@ -38,8 +38,6 @@ const RequestPage = () => {
     }
   },[userProfile])
 
-  console.log(userCredentials)
-
     // manage if can submit
   const [allowSubmit, setAllowSubmit] = useState(false)
 

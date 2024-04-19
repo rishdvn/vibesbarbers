@@ -24,10 +24,8 @@ const BookingPage = () => {
     setOtpSent(false);
     setVerified(false);
     setAppDetails(prev => ({...prev, "telNo": ""}))
-    signUserOut();
+    // signUserOut();
   }
-
-  console.log(user)
 
   auth.languageCode = 'en';
 

@@ -154,8 +154,10 @@ export default function MultipleSchedule() {
       let tempIndividualBarber = []
       // if individual view, filter for user logged in
       for (let barber of tempWorkingBarbers) {
-        if (barber.uid === user.uid) {
-          tempIndividualBarber.push(barber)
+        if (user) {
+          if (barber.uid === user.uid) {
+            tempIndividualBarber.push(barber)
+          }
         }
       }
 

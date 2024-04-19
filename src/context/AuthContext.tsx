@@ -21,6 +21,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode}) 
   
   // Sign a user out
   const signUserOut = () => {
+    console.log('signUserOut function called'); // Add this line
       signOut(auth).then(() => {
           console.log('User signed out')
         }).catch((error) => {
@@ -34,13 +35,16 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode}) 
   // Listen for user state changes
   useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
+        console.log('onAuthStateChanged listener triggered', { user, pathName }); // Add this line
           if (user) {
               setUser(user);
+              console.log('User detected')
           } else {
-              setUser(null)
-              if (pathName !== '/login' && pathName !== '/signup' && pathName !== '/booking') {
-                router.push('/')
-              }
+              console.log('User not detected')
+              // setUser(null)
+              // if (pathName !== '/login' && pathName !== '/signup' && pathName !== '/booking') {
+              //   router.push('/')
+              // }
           }
       });
   

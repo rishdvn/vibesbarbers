@@ -214,7 +214,6 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
               // check for overlap between any existing appointments/lunch breaks
               let overlapExists = false;
               for (let app of barberExistingApps) {
-                // *** come back to this *** 
                 if (!app.appDetails.isExtra) {
                   const existingStartTime = app.appDetails.appStartTime.toDate();
                   const existingEndTime = app.appDetails.appEndTime.toDate();
@@ -269,10 +268,12 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
                   // check for overlap between any existing appointments/lunch breaks
                   let overlapExists = false;
                   for (let app of barberExistingApps) {
-                    const existingStartTime = app.appDetails.appStartTime.toDate();
-                    const existingEndTime = app.appDetails.appEndTime.toDate();
-                    if (areIntervalsOverlapping({start: appStartTime, end: appEndTime},{start: existingStartTime, end: existingEndTime})) {
-                      overlapExists = true;
+                    if (!app.appDetails.isExtra) {
+                      const existingStartTime = app.appDetails.appStartTime.toDate();
+                      const existingEndTime = app.appDetails.appEndTime.toDate();
+                      if (areIntervalsOverlapping({start: appStartTime, end: appEndTime},{start: existingStartTime, end: existingEndTime})) {
+                        overlapExists = true;
+                      }
                     }
                   }
                   // check if time has not passed
