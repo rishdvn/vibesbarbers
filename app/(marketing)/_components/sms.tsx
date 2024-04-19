@@ -225,7 +225,7 @@ export default function SmsLogin() {
             </h2>
           </div>
   
-          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px] text-xs">
+          <div className="mt-10 mx-auto w-full max-w-[480px] text-xs">
             <div className="grid grid-cols-1 gap-1 space-y-0">
               <label
                   className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
