@@ -24,7 +24,7 @@ const BookingPage = () => {
     setOtpSent(false);
     setVerified(false);
     setAppDetails(prev => ({...prev, "telNo": ""}))
-    // signUserOut();
+    signUserOut();
   }
 
   auth.languageCode = 'en';
@@ -76,9 +76,6 @@ const BookingPage = () => {
         console.error(error)
       })
     }
-    
-    console.log("captha?")
-    console.log(!verified && !otpSent)
 
     {/* 0. FETCH RELEVANT DATA */}
     // fetch users, filter for barbers

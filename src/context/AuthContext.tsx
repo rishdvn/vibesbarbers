@@ -41,10 +41,10 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode}) 
               console.log('User detected')
           } else {
               console.log('User not detected')
-              // setUser(null)
-              // if (pathName !== '/login' && pathName !== '/signup' && pathName !== '/booking') {
-              //   router.push('/')
-              // }
+              setUser(null)
+              if (pathName !== '/login' && pathName !== '/signup' && pathName !== '/booking') {
+                router.push('/')
+              }
           }
       });
   
