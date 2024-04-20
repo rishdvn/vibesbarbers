@@ -55,6 +55,12 @@ export default function Sidebar({children}:{children:ReactNode}) {
           { name: 'Team', href: '/team', icon: UsersIcon, current: pathNameSlice === "team" },
           { name: 'Schedule', href: '/schedule', icon: DocumentDuplicateIcon, current: pathNameSlice === "schedule" }
         ])
+      } else if (userProfile.role === "Receptionist") {
+        setNavItems([
+          { name: 'Calendar', href: '/calendar', icon: CalendarDaysIcon, current: pathNameSlice === "calendar" },
+          { name: 'Tally', href: '/tally', icon: ShoppingBagIcon, current: pathNameSlice === "tally" },
+          { name: 'Schedule', href: '/schedule', icon: DocumentDuplicateIcon, current: pathNameSlice === "schedule" }
+        ])
       } else {
         setNavItems([
           { name: 'Calendar', href: '/calendar', icon: CalendarDaysIcon, current: pathNameSlice === "calendar" },
