@@ -349,7 +349,7 @@ const BookingPage = () => {
     // mobible 2 week interval!
     const [twoWeekInterval, setTwoWeekInterval] = useState(eachDayOfInterval({
         start: today,
-        end: addDays(today, 12)
+        end: addDays(today, 14)
       }))
 
     const [barbersWorking, setBarbersWorking] = useState([]);
