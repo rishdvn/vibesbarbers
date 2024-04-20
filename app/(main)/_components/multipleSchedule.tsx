@@ -188,7 +188,12 @@ export default function MultipleSchedule() {
 
   const CalendarItem = ({appointmentObject, color}) => {
     const appointment= appointmentObject;
-    const dayStart = addHours(startOfDay(selectedDay),9)
+    let dayStart;
+    if (format(selectedDay, 'EEEE').toLowerCase() === "sunday") {
+      dayStart = addHours(startOfDay(selectedDay),10)
+    } else {
+      dayStart = addHours(startOfDay(selectedDay),9)
+    }
     const appStart = appointment.appDetails.appStartTime.toDate()
     const appEnd = appointment.appDetails.appEndTime.toDate()
     const appService = appointment.appDetails.service
