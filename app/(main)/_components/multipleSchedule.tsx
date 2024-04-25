@@ -254,7 +254,7 @@ export default function MultipleSchedule() {
       setPriceToggle(!priceToggle)
       console.log("Updated document ID:", appId);
     }
-
+    
     return (
       <Menu 
         as="div" 

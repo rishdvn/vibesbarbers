@@ -6,6 +6,8 @@ import { use, useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { add, addDays, addHours, addMinutes, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, endOfDay, endOfMonth, endOfWeek, format, formatDistance, getDay, isEqual, isSameDay, isSameMonth, parse, parseISO, set, startOfDay, startOfWeek } from 'date-fns';
 
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -197,12 +199,16 @@ export default function TallyPage() {
     
     // define tallyData as the selectedDays tally information, updates if selectedDay changes or talllys fetch change
     const [tallyData, setTallyData] = useState({});
-    
+
+
     useEffect(() => {
         let tempTallyData = {}
         for (let tally of tallys) {
-            if (isSameDay(tally.date.toDate(), selectedDay)) {
-                tempTallyData = tally;
+            if (tally.date instanceof firebase.firestore.Timestamp) {
+                const tallyDate = tally.date.toDate();
+                if (isSameDay(tallyDate, selectedDay)) {
+                    tempTallyData = tally;
+                }
             }
         }
         setTallyData(tempTallyData)
