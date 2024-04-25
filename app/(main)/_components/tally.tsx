@@ -204,11 +204,9 @@ export default function TallyPage() {
     useEffect(() => {
         let tempTallyData = {}
         for (let tally of tallys) {
-            if (tally.date instanceof firebase.firestore.Timestamp) {
-                const tallyDate = tally.date.toDate();
-                if (isSameDay(tallyDate, selectedDay)) {
-                    tempTallyData = tally;
-                }
+            const tallyDate = tally.date.toDate();
+            if (isSameDay(tallyDate, selectedDay)) {
+                tempTallyData = tally;
             }
         }
         setTallyData(tempTallyData)
