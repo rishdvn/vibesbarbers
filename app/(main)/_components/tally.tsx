@@ -204,9 +204,11 @@ export default function TallyPage() {
     useEffect(() => {
         let tempTallyData = {}
         for (let tally of tallys) {
-            const tallyDate = tally.date.toDate();
-            if (isSameDay(tallyDate, selectedDay)) {
-                tempTallyData = tally;
+            if (tally.date) {
+                const tallyDate = tally.date.toDate();
+                if (isSameDay(tallyDate, selectedDay)) {
+                    tempTallyData = tally;
+                }
             }
         }
         setTallyData(tempTallyData)
