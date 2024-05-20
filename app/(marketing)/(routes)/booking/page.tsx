@@ -488,68 +488,85 @@ const BookingPage = () => {
             {/* Divider container */}
           <div className="text-xs flex flex-col gap-y-6 px-4 py-5">
                 <div
-                  className='flex flex-col gap-y-2'
+                  className='flex flex-col gap-y-2 items-center text-base'
                 >
-                  <label
-                      className="text-lg block font-semibold text-gray-900"
-                  >
-                      BOOKING CONFIRMATION
-                  </label>
-                  <div className='flex text-sm font-medium text-gray-700'>
-                      Please take a screenshot for your reference.
+                    <label
+                        className="text-lg block font-semibold text-gray-900"
+                    >
+                        BOOKING CONFIRMATION
+                    </label>
+                  <div className='flex flex-col gap-y-2 items-center rounded-md border border-gray-200 p-2'>
+                  <div className='flex text-lg font-medium text-red-700'>
+                      Please screenshot for your reference.
                   </div>
-                  <div className='flex text-sm font-medium text-gray-700'>
-                      Call us on +(03) 9363 1126 for cancellations or multiple booking requests. Please arrive 5 minutes or you will be penalised.
+
+                  <div className='flex flex-col gap-y-1 items-center'>
+                    {/* SERVICE */}
+                    <div className="grid grid-cols-1 space-y-0">
+                        <label
+                            className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
+                        >
+                            {/* SERVICE */}
+                        </label>
+                        <div className='flex py-1 font-semibold text-lg'>
+                            {appDetails.service}
+                        </div>
+                    </div>
+
+                    {/* APP DATE */}
+                    <div className="grid grid-cols-1 gap-1 space-y-0">
+                        <label
+                            className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
+                        >
+                            {/* APPOINTMENT DATE */}
+                        </label>
+                        <div className='flex py-1 flex-row gap-x-1'>
+                            on
+                            <span className='font-semibold'>
+                              {format(appDetails.appDay,'dd/MM/yyyy')}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* APP TIME */}
+                    <div className="grid grid-cols-1 gap-1 space-y-0">
+                        <label
+                            className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
+                        >
+                            {/* APPOINTMENT TIME */}
+                        </label>
+                        <div className='flex py-1 flex-row gap-x-1'>
+                            at
+                            <span className='font-semibold'>
+                              {`${format(appDetails.appStartTime,'hh:mm a')} - ${format(appDetails.appEndTime,'hh:mm a')}`}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* BARBER */}
+                    <div className="grid grid-cols-1 space-y-0">
+                        <label
+                            className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
+                        >
+                            {/* BARBER */}
+                        </label>
+                        <div className='flex py-1'>
+                            with {users.find(user => user.uid === appDetails.barberUID).firstname}
+                        </div>
+                    </div>
+                  </div>
+                    <div className='flex text-sm text-center font-medium text-gray-700'>
+                        Call us on
+                        <span className='font-semibold px-1'>
+                          +(03) 9363 1126
+                        </span>
+                        for cancellations or multiple bookings.
+                    </div>
+                    <div className='flex text-sm text-center font-medium text-gray-700'>
+                        Please arrive 5 minutes or you will be penalised.
+                    </div>
                   </div>
                 </div>
-              
-              {/* SERVICE */}
-              <div className="grid grid-cols-1 gap-1 space-y-0">
-                  <label
-                      className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                      SERVICE
-                  </label>
-                  <div className='flex py-1'>
-                      {appDetails.service}
-                  </div>
-              </div>
-
-              {/* BARBER */}
-              <div className="grid grid-cols-1 gap-1 space-y-0">
-                  <label
-                      className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                      BARBER
-                  </label>
-                  <div className='flex py-1'>
-                      {users.find(user => user.uid === appDetails.barberUID).firstname}
-                  </div>
-              </div>
-
-              {/* APP DATE */}
-              <div className="grid grid-cols-1 gap-1 space-y-0">
-                  <label
-                      className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                      APPOINTMENT DATE
-                  </label>
-                  <div className='flex py-1'>
-                      {format(appDetails.appDay,'dd/MM/yyyy')}
-                  </div>
-              </div>
-
-              {/* APP TIME */}
-              <div className="grid grid-cols-1 gap-1 space-y-0">
-                  <label
-                      className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                      APPOINTMENT TIME
-                  </label>
-                  <div className='flex py-1'>
-                      {`${format(appDetails.appStartTime,'hh:mm a')} - ${format(appDetails.appEndTime,'hh:mm a')}`}
-                  </div>
-              </div>
           </div>
 
         </div>
@@ -644,7 +661,7 @@ const BookingPage = () => {
                     >
                     APPOINTMENT TIME
                     </label>
-                    {appointmentTimes ? appointmentTimes.map(time => {
+                    {appointmentTimes && appointmentTimes.length > 0 ? appointmentTimes.map(time => {
                     const appStartTime = format(time.start,"hh:mm a")
                     const appEndTime = format(time.end,"hh:mm a")
 
