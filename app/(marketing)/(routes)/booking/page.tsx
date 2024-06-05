@@ -584,7 +584,12 @@ const BookingPage = () => {
                     <label
                         className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
                     >
-                        SERVICE
+                        <div className='flex flex-row gap-x-1'>
+                          <span className='text-red-600'>
+                            1.
+                          </span>
+                          SERVICE
+                        </div>
                     </label>
                     {serviceOptions.map((service) => (
                         <div 
@@ -605,7 +610,12 @@ const BookingPage = () => {
                     <label
                         className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
                     >
-                        BARBER
+                        <div className='flex flex-row gap-x-1'>
+                          <span className='text-red-600'>
+                            2.
+                          </span>
+                          BARBER
+                        </div>
                     </label>
                     <div
                         className='grid grid-cols-3 gap-1 space-y-0'
@@ -639,7 +649,12 @@ const BookingPage = () => {
                         htmlFor="User-name"
                         className="block text-xs font-semibold leading-6 text-gray-900 sm:mt-1.5"
                     >
-                        APPOINTMENT DATE
+                        <div className='flex flex-row gap-x-1'>
+                          <span className='text-red-600'>
+                            3.
+                          </span>
+                          APPOINTMENT DATE
+                        </div>
                     </label>
 
                     <div className='flex flex-row w-full overflow-x-auto border-b border-gray-200 pb-2 gap-x-4'>
@@ -659,7 +674,12 @@ const BookingPage = () => {
                     htmlFor="User-name"
                     className="block text-xs font-semibold leading-6 text-gray-900 sm:mt-1.5"
                     >
-                    APPOINTMENT TIME
+                      <div className='flex flex-row gap-x-1'>
+                        <span className='text-red-600'>
+                          4.
+                        </span>
+                        APPOINTMENT TIME
+                      </div>
                     </label>
                     {appointmentTimes && appointmentTimes.length > 0 ? appointmentTimes.map(time => {
                     const appStartTime = format(time.start,"hh:mm a")
@@ -689,7 +709,12 @@ const BookingPage = () => {
                 <label
                     className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
                 >
-                    NAME
+                    <div className='flex flex-row gap-x-1'>
+                        <span className='text-red-600'>
+                          5.
+                        </span>
+                        NAME
+                      </div>
                 </label>
                 <div className="col-span-1">
                     <input
@@ -708,7 +733,15 @@ const BookingPage = () => {
                   <label
                       className="block font-semibold leading-6 text-gray-900 sm:mt-1.5"
                   >
-                      PHONE NUMBER
+                      <div className='flex flex-row gap-x-1'>
+                        <span className='text-red-600'>
+                          6.
+                        </span>
+                        PHONE NUMBER
+                        <span className='font-medium'>
+                          (Do not include 0 or +61. E.g., 4xx xxx xxx)
+                        </span>
+                      </div>
                   </label>
                   { user ? (
                     <div className='flex flex-row justify-between py-2'>
