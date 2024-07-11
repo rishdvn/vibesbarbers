@@ -470,7 +470,7 @@ const BookingPage = () => {
   }
 
   const handleServiceChange = (serviceObject) => {
-    setAppDetails(prev => ({...prev, service: serviceObject.title}));
+    setAppDetails(prev => ({...prev, service: serviceObject.title, appDay: "", appStartTime: "", appEndTime: ""}));
   }
 
   const handleBarberChange = (barberObject) => {
@@ -700,7 +700,7 @@ const BookingPage = () => {
                         {`${appStartTime} - ${appEndTime}`}
                         </div>
                     )
-                    }) : "No appointments available for day"}
+                    }) : "The barber is fully booked for the day. Please select another day."}
                 </div>
                 )}
 
