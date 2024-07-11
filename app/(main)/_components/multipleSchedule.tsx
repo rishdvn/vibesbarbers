@@ -177,10 +177,10 @@ export default function MultipleSchedule() {
     "monday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'],
     "tuesday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'],
     "wednesday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'],
-    "thursday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM'],
-    "friday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM'],
+    "thursday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'],
+    "friday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'],
     "saturday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM'],
-    "sunday" : ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM']
+    "sunday" : ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM']
   }
 
   let dayTiming = times[`${format(selectedDay,'EEEE').toLowerCase()}`]
@@ -190,7 +190,7 @@ export default function MultipleSchedule() {
     const appointment= appointmentObject;
     let dayStart;
     if (format(selectedDay, 'EEEE').toLowerCase() === "sunday") {
-      dayStart = addHours(startOfDay(selectedDay),10)
+      dayStart = addHours(startOfDay(selectedDay),9)
     } else {
       dayStart = addHours(startOfDay(selectedDay),9)
     }
@@ -512,7 +512,7 @@ export default function MultipleSchedule() {
         className="z-0 relative flex flex-col gap-y-2"
       >
           {!cancelToggle && !priceToggle && (
-            <Menu.Button as="div" className="flex items-start">
+            <Menu.Button as="div" className="flex ">
               <li
                 key={appService + Math.random()}
                 className={classNames(
