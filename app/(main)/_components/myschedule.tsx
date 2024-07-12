@@ -1,6 +1,6 @@
 "use client";
 
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../src/index.ts";
 import { useEffect, useState } from "react";
 import { add, addDays, addHours, addMinutes, differenceInMinutes, eachDayOfInterval, endOfMonth, endOfWeek, format, formatDate, formatDistance, getDay, isEqual, isSameDay, isSameMonth, isSameWeek, isWithinInterval, parse, parseISO, startOfDay, startOfWeek } from 'date-fns';
@@ -100,10 +100,14 @@ function classNames(...classes) {
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           if (data.uid === selectedUser.uid) {
-            rostersFetched.push(data);
+            rostersFetched.push({
+              id: doc.id,
+              ...data
+            });
           }
         });
         rostersFetched.sort((a, b) => a.selectedTimes.start.toDate() - b.selectedTimes.start.toDate());
+        console.log(rostersFetched)
         setRosters(rostersFetched);
       });
     },[selectedUser, flyOverOpen])
@@ -138,6 +142,15 @@ function classNames(...classes) {
       "saturday",
       "sunday"
     ]
+
+    const deleteSchedule = async (rosterId: string) => {
+      try {
+        await deleteDoc(doc(db, "roster", rosterId));
+        console.log("Document successfully deleted!");
+      } catch (error) {
+        console.error("Error removing document: ", error);
+      }
+    }
     
     const RosteredShift = ({roster}) => {
 
@@ -147,18 +160,46 @@ function classNames(...classes) {
 
       let allDaysOff = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].every(day => !rosterData[day].isWorking)
       
+
       return (
         <div
           className="flex flex-col mt-4"
           key={rosterData.start.toDate() + Math.random()}
         >
-          <h1
-            className="text-xs font-semibold leading-6  sm:mt-1.5 text-gray-700"
+          <div
+            className="flex flex-row justify-between text-xs font-semibold leading-6  sm:mt-1.5 text-gray-700"
           >
             {rosterData.end === "Never" ? `${startDate} - ${endDate}` : 
               isSameDay(rosterData.start.toDate(), rosterData.end.toDate()) ? startDate : `${startDate} - ${endDate}`
             }
-          </h1>
+            <Menu
+              as="div"
+              className="relative bg-red-200 px-1 rounded-md text-red-800 mr-2"
+            >
+              <Menu.Button
+                as="div"
+                className="cursor-pointer"
+              >
+                DELETE
+              </Menu.Button>
+              <Menu.Items as="div" className="z-50 flex flex-col divide-y divide-gray-100 absolute right-0 mt-1 text-xs bg-white rounded-lg border border-gray-100 min-w-min">
+                  <Menu.Item
+                    as="div" className="text-black font-normal p-2 rounded-lg"
+                  >
+                    Are you sure?
+                  </Menu.Item>
+                  {
+                  <Menu.Item
+                    as="div"
+                    className="p-2 rounded-lg hover:bg-gray-200 cursor-pointer"
+                    onClick={() => {deleteSchedule(roster.id)}}
+                  >
+                    Yes, delete
+                  </Menu.Item>
+                  }
+              </Menu.Items>
+            </Menu>
+          </div>
           {allDaysOff ? (
             <div
               className="flex flex-col gap-y-1 mt-2 rounded-lg text-gray-700 text-xs font-medium"
@@ -246,6 +287,7 @@ function classNames(...classes) {
 
     const [index, setIndex] = useState(0);
 
+    console.log(rosters)
     return ( 
       <>
       <RegFlyOver flyOverOpen={flyOverOpen} setFlyOverOpen={setFlyOverOpen} user={selectedUser}/>
@@ -465,12 +507,7 @@ function classNames(...classes) {
                                   <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
                                   </button>
                               </div>
-
-                              
-
                           </div>
-                          
-                            
                         </div>
                     </div>
                 </div>
