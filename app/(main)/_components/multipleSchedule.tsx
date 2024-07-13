@@ -254,6 +254,14 @@ export default function MultipleSchedule() {
       setPriceToggle(!priceToggle)
       console.log("Updated document ID:", appId);
     }
+
+    // const [isChecked, setIsChecked] = useState(false);
+
+    async function handleCheckedPublish() {
+      await updateDoc(doc(db, "appointments", appId), {
+        isChecked: !appointment.isChecked
+      })
+    }
     
     return (
       <Menu 
@@ -341,6 +349,17 @@ export default function MultipleSchedule() {
               </li>
             </Menu.Button>
           )}
+          <div className="relative h-full w-full"
+          key={appId + Math.random()}>
+            <div className="absolute bottom-0 right-0 z-50 flex justify-end items-end p-2">
+              <input
+                type="checkbox"
+                className="cursor-pointer"
+                onClick={handleCheckedPublish}
+                checked={appointment.isChecked}
+              ></input>
+            </div>
+          </div>
           {cancelToggle && (
             <div
               className='items-start bg-red-100 select-none group absolute inset-1 flex flex-col gap-y-1 rounded-lg p-2 text-xs leading-5'
