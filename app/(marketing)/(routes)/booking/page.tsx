@@ -695,7 +695,7 @@ const BookingPage = () => {
                                 )
                             }
                         >
-                        {`${appStartTime} - ${appEndTime}`}
+                        {`${appStartTime}`}
                         </div>
                     )
                     }) : "The barber is fully booked for the day. Please select another day."}
