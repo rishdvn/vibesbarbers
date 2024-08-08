@@ -486,7 +486,7 @@ const BookingPage = () => {
                 {submited ? "Appointment booked" : "Book an appointment"}
             </div>
             {/* Divider container */}
-          <div className="text-xs flex flex-col gap-y-6 px-4 py-5">
+          <div className="text-xs flex flex-col gap-y-6 px-3 py-5">
                 <div
                   className='flex flex-col gap-y-2 items-center text-base'
                 >
@@ -538,7 +538,7 @@ const BookingPage = () => {
                         <div className='flex py-1 flex-row gap-x-1'>
                             at
                             <span className='font-semibold'>
-                              {`${format(appDetails.appStartTime,'hh:mm a')} - ${format(appDetails.appEndTime,'hh:mm a')}`}
+                              {`${format(appDetails.appStartTime,'hh:mm a')}`}
                             </span>
                         </div>
                     </div>
@@ -557,9 +557,7 @@ const BookingPage = () => {
                   </div>
                     <div className='flex text-sm text-center font-medium text-gray-700'>
                         Call us on
-                        <span className='font-semibold px-1'>
                           +(03) 9363 1126
-                        </span>
                         for cancellations or multiple bookings.
                     </div>
                     <div className='flex text-sm text-center font-medium text-gray-700'>
