@@ -679,6 +679,7 @@ const BookingPage = () => {
                         APPOINTMENT TIME
                       </div>
                     </label>
+                    Haircut: 20 minutes, Haircut & Beard: 40 minutes
                     {appointmentTimes && appointmentTimes.length > 0 ? appointmentTimes.map(time => {
                     const appStartTime = format(time.start,"hh:mm a")
                     const appEndTime = format(time.end,"hh:mm a")
