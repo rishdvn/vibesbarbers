@@ -160,7 +160,26 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
         }
         setBarberExistingApps(tempBarberExistingApps);          
       }
-    }, [appDetails, appointments])
+    }, [appDetails.barberUID, appointments])
+
+    useEffect(() => {
+      let existingAppTaken = false
+      if (barberExistingApps) {
+        for (let existingApp of barberExistingApps) {
+          if (isSameDay(existingApp.appDetails.appDay.toDate(), appDetails.appDay)) {
+            console.log("same day apps")
+            if (areIntervalsOverlapping({start: appDetails.appStartTime, end: appDetails.appEndTime},{start: existingApp.appDetails.appStartTime.toDate(), end: existingApp.appDetails.appEndTime.toDate()})) {
+              console.log("I ran bro")
+              existingAppTaken = true;
+            }
+          }
+        }
+      }
+
+      if (existingAppTaken) {
+        setAppDetails(prev => ({...prev, "appStartTime": "", "appEndTime": ""}))
+      }
+    },[barberExistingApps,appDetails.appDay])
 
     // find possible appointment times for the day
     useEffect(() => {

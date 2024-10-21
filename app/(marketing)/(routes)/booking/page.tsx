@@ -18,6 +18,9 @@ function classNames(...classes) {
   ]
 
 const BookingPage = () => {
+
+  const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const { user, signUserOut } = useUserAuth();
 
   const handleNumberChange = () => {
@@ -109,6 +112,18 @@ const BookingPage = () => {
 
   // fetch existing appointments
   const [appointments, setAppointments] = useState([]);
+
+    // initialize appDetials object
+    const [appDetails, setAppDetails] = useState({
+      service: "",
+      barberUID: "",
+      firstname: "",
+      telNo: "",
+      appDay: "",
+      appStartTime: "",
+      appEndTime: "",
+      isExtra: false
+    });
   
   useEffect(() => {
     onSnapshot(collection(db, "appointments"), (querySnapshot) => {
@@ -139,19 +154,6 @@ const BookingPage = () => {
     await publishToAppointments(appDetails);
     setSubmited(true);
   }
-
-
-  // initialize appDetials object
-  const [appDetails, setAppDetails] = useState({
-    service: "",
-    barberUID: "",
-    firstname: "",
-    telNo: "",
-    appDay: "",
-    appStartTime: "",
-    appEndTime: "",
-    isExtra: false
-  });
 
   const [allowSubmit, setAllowSubmit] = useState(false);
 
@@ -200,6 +202,7 @@ const BookingPage = () => {
     // find all barber rosters
     const [relevantRosters, setRelevantRosters] = useState(null);
 
+    // set RelevantRosters as picked barbers rosters when rosters or appDetails updates
     useEffect(() => {
       const tempRelevantRosters = [];
       if (rosters) {
@@ -219,6 +222,7 @@ const BookingPage = () => {
     // determine existing appointments
     const [barberExistingApps, setBarberExistingApps] = useState(null);
 
+    // if they change barber or new appointments are fetched, update existing apps
     useEffect(() => {
       if (appDetails.barberUID) {
         const tempBarberExistingApps = [];
@@ -227,9 +231,49 @@ const BookingPage = () => {
             tempBarberExistingApps.push(app)
           }
         }
-        setBarberExistingApps(tempBarberExistingApps);          
+        setBarberExistingApps(tempBarberExistingApps);
       }
-    }, [appDetails, appointments])
+    }, [appDetails.barberUID, appointments])
+
+    useEffect(() => {
+      let existingAppTaken = false
+      if (barberExistingApps) {
+        for (let existingApp of barberExistingApps) {
+          if (isSameDay(existingApp.appDetails.appDay.toDate(), appDetails.appDay)) {
+            console.log("same day apps")
+            if (areIntervalsOverlapping({start: appDetails.appStartTime, end: appDetails.appEndTime},{start: existingApp.appDetails.appStartTime.toDate(), end: existingApp.appDetails.appEndTime.toDate()})) {
+              console.log("I ran bro")
+              existingAppTaken = true;
+            }
+          }
+        }
+      }
+
+      if (existingAppTaken) {
+        setAppDetails(prev => ({...prev, "appStartTime": "", "appEndTime": ""}))
+      }
+    },[barberExistingApps,appDetails.appDay])
+
+    const [bookingTime, setBookingTime] = useState({
+      appDay: "",
+      appStartTime: "",
+      appEndTime: ""
+    });
+
+    useEffect(() => {
+      if (appDetails.appDay !== "" && appDetails.appStartTime !== "" && appDetails.appEndTime !== "") {
+        setBookingTime({
+          appDay: appDetails.appDay,
+          appStartTime: appDetails.appStartTime,
+          appEndTime: appDetails.appEndTime
+        })
+      }
+    },[appDetails])
+
+    // console.log(appDetails.appStartTime)
+    // if(barberExistingApps) {
+    //   console.log(barberExistingApps[0].appDetails.appStartTime.toDate())
+    // }
 
     // find possible appointment times for the day
     useEffect(() => {
@@ -342,7 +386,6 @@ const BookingPage = () => {
             setAppointmentTimes(appointmentTimes);
           }
         }
-
       }
     },[appDetails, rosters, relevantRosters, selectedDay, barberExistingApps])
 
@@ -496,8 +539,8 @@ const BookingPage = () => {
                         BOOKING CONFIRMATION
                     </label>
                   <div className='flex flex-col gap-y-2 items-center rounded-md border border-gray-200 p-2'>
-                  <div className='flex text-lg font-medium text-red-700'>
-                      Please screenshot for your reference.
+                  <div className='flex text-3xl font-medium text-red-700'>
+                      Validate screeenshot at Vibes Barbers.
                   </div>
 
                   <div className='flex flex-col gap-y-1 items-center'>
@@ -523,7 +566,7 @@ const BookingPage = () => {
                         <div className='flex py-1 flex-row gap-x-1'>
                             on
                             <span className='font-semibold'>
-                              {format(appDetails.appDay,'dd/MM/yyyy')}
+                              {format(bookingTime.appDay,'dd/MM/yyyy')}
                             </span>
                         </div>
                     </div>
@@ -538,7 +581,7 @@ const BookingPage = () => {
                         <div className='flex py-1 flex-row gap-x-1'>
                             at
                             <span className='font-semibold'>
-                              {`${format(appDetails.appStartTime,'hh:mm a')}`}
+                              {`${format(bookingTime.appStartTime,'hh:mm a')}`}
                             </span>
                         </div>
                     </div>
