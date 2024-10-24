@@ -168,9 +168,11 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
         for (let existingApp of barberExistingApps) {
           if (isSameDay(existingApp.appDetails.appDay.toDate(), appDetails.appDay)) {
             console.log("same day apps")
-            if (areIntervalsOverlapping({start: appDetails.appStartTime, end: appDetails.appEndTime},{start: existingApp.appDetails.appStartTime.toDate(), end: existingApp.appDetails.appEndTime.toDate()})) {
-              console.log("I ran bro")
-              existingAppTaken = true;
+            if (existingApp.appDetails.appStartTime) {
+              if (areIntervalsOverlapping({start: appDetails.appStartTime, end: appDetails.appEndTime},{start: existingApp.appDetails.appStartTime.toDate(), end: existingApp.appDetails.appEndTime.toDate()})) {
+                console.log("I ran bro")
+                existingAppTaken = true;
+              }
             }
           }
         }
@@ -226,7 +228,11 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
             if (rosterEndTimeObject.period === "AM") {
               rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour)),rosterEndTimeObject.min)
             } else {
-              rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour) + 12),rosterEndTimeObject.min)
+              if (Number(rosterEndTimeObject.hour) === 12) {
+                rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour)),rosterEndTimeObject.min)
+              } else {
+                rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour) + 12),rosterEndTimeObject.min)
+              }
             }
 
             console.log(rosterStartTime, rosterEndTime)

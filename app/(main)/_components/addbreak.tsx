@@ -195,7 +195,11 @@ export default function AddBreak({flyOverOpen, setFlyOverOpen, user}:{flyOverOpe
           if (rosterEndTimeObject.period === "AM") {
             rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour)),rosterEndTimeObject.min)
           } else {
-            rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour) + 12),rosterEndTimeObject.min)
+            if (Number(rosterEndTimeObject.hour) === 12) {
+              rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour)),rosterEndTimeObject.min)
+            } else {
+              rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour) + 12),rosterEndTimeObject.min)
+            }
           }
   
           let potentialStartTimes = [];
