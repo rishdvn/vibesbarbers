@@ -219,6 +219,8 @@ const BookingPage = () => {
     // determine appointment times
     const [appointmentTimes, setAppointmentTimes] = useState(null);
 
+    console.log(appointmentTimes)
+
     // determine existing appointments
     const [barberExistingApps, setBarberExistingApps] = useState(null);
 
@@ -241,9 +243,11 @@ const BookingPage = () => {
         for (let existingApp of barberExistingApps) {
           if (isSameDay(existingApp.appDetails.appDay.toDate(), appDetails.appDay)) {
             console.log("same day apps")
-            if (areIntervalsOverlapping({start: appDetails.appStartTime, end: appDetails.appEndTime},{start: existingApp.appDetails.appStartTime.toDate(), end: existingApp.appDetails.appEndTime.toDate()})) {
-              console.log("I ran bro")
-              existingAppTaken = true;
+            if (existingApp.appDetails.appStartTime) {
+              if (areIntervalsOverlapping({start: appDetails.appStartTime, end: appDetails.appEndTime},{start: existingApp.appDetails.appStartTime.toDate(), end: existingApp.appDetails.appEndTime.toDate()})) {
+                console.log("I ran bro")
+                existingAppTaken = true;
+              }
             }
           }
         }
@@ -320,9 +324,13 @@ const BookingPage = () => {
             if (rosterEndTimeObject.period === "AM") {
               rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour)),rosterEndTimeObject.min)
             } else {
-              rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour) + 12),rosterEndTimeObject.min)
+              if (Number(rosterEndTimeObject.hour) === 12) {
+                rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour)),rosterEndTimeObject.min)
+              } else {
+                rosterEndTime = addMinutes(addHours(selectedDay, Number(rosterEndTimeObject.hour) + 12),rosterEndTimeObject.min)
+              }
             }
-    
+
             let potentialStartTimes = [];
             let time = rosterStartTime;
     
