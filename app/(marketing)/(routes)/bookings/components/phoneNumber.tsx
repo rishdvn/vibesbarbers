@@ -2,32 +2,30 @@ import { Appointment } from '@/utils/schemas/Appointment';
 import React, { useEffect, useState } from 'react';
 import { auth } from '@/src/index.ts'
 import { Form } from '@/utils/schemas/Form';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 
 interface PhoneNumberProps {
   user: { phoneNumber: string } | null;
   appDetails: Form;
-  otpSent: boolean;
-  verified: boolean;
-  otp: string;
   handleAppDetails: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleNumberChange: () => void;
-  handleSendOtp: () => void;
-  handleOTPChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  setAppointment: (prev: Form) => void;
   signUserOut: () => void;
 }
+
+declare global {
+    interface Window {
+      recaptchaVerifier: RecaptchaVerifier;
+    }
+  }
 
 const PhoneNumber: React.FC<PhoneNumberProps> = ({
   user,
   appDetails,
   handleAppDetails,
-  setAppointment,
   signUserOut,
 }) => {
     
     const [otp, setOtp] = useState('');
-    const [confirmationResult, setConfirmationResult] = useState(null);
+    const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
     const [otpSent, setOtpSent] = useState(false);
     const [verified, setVerified] = useState(false);
     
@@ -62,11 +60,11 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
     };
     
 
-    const handleOTPSubmit = async (e) => {
+    const handleOTPSubmit = async (e: any) => {
         confirmationResult.confirm(otp).then((result) => {
             const user = result.user;
             setVerified(true);
-        }).catch((error) => {
+        }).catch((error: any) => {
             console.error(error)
         })
     }
@@ -74,7 +72,6 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
     const handleNumberChange = () => {
         setOtpSent(false);
         setVerified(false);
-        setAppointment(prev => ({...prev, "telNo": ""}));
         signUserOut();
     }
 

@@ -157,24 +157,6 @@ const FormComponent = ({
         });
     }
 
-    const [otp, setOtp] = useState('');
-    const [confirmationResult, setConfirmationResult] = useState(null);
-    const [otpSent, setOtpSent] = useState(false);
-    const [verified, setVerified] = useState(false);
-    
-
-    const handleOTPChange = (e) => {
-        setOtp(e.target.value);
-    }
-
-
-
-    const handleNumberChange = () => {
-        setOtpSent(false);
-        setVerified(false);
-        setAppointment(prev => ({...prev, "telNo": ""}));
-        signUserOut();
-    }
 
     return (
         <div className="text-xs flex flex-col gap-y-10 px-4 py-5">
@@ -197,12 +179,7 @@ const FormComponent = ({
             <PhoneNumber 
                 user={user} 
                 appDetails={appointment} 
-                otpSent={otpSent} 
-                verified={verified} 
-                otp={otp} 
                 handleAppDetails={e => setAppointment(prev => ({...prev, telNo: e.target.value}))} 
-                handleNumberChange={handleNumberChange} 
-                handleOTPChange={handleOTPChange} 
                 signUserOut={signUserOut} 
             />
             </>}
