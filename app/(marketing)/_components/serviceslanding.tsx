@@ -1,4 +1,4 @@
-const people = [
+const services = [
     {
       name: 'Haircut',
       time: '20mins',
@@ -17,12 +17,12 @@ const people = [
     return (
       <div>
         <ul role="list" className="divide-y divide-gray-100">
-          {people.map((person) => (
-            <li key={person.time} className=" flex items-center justify-between gap-x-6 py-5">
+          {services.map((service) => (
+            <li key={service.time} className=" flex items-center justify-between gap-x-6 py-5">
               <div className="flex min-w-0 gap-x-4">
                 <div className="flex flex-col min-w-0 gap-y-1">
-                  <p className="text-md font-semibold leading-6 text-gray-900">{person.name}</p>
-                  <p className="mt-1 truncate text-sm leading-5 text-gray-500">{person.time}</p>
+                  <p className="text-md font-semibold leading-6 text-gray-900">{service.name}</p>
+                  <p className="mt-1 truncate text-sm leading-5 text-gray-500">{service.time}</p>
                 </div>
               </div>
               <a
