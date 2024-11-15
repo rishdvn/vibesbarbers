@@ -15,7 +15,6 @@ import PhoneNumber from "./phoneNumber";
 import { Form, FormSchema } from "@/utils/schemas/Form";
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import BookButton from './bookButton';
-import { useService } from '@/app/context/ServiceContext';
 
 const SLOT_TIME = 20;
 
@@ -46,8 +45,8 @@ const FormComponent = ({
     const [allowSubmit, setAllowSubmit] = useState(false);
 
 
-    function findAvailableSlots(appointment: typeof FormSchema) {
-        const selectedDay: Date = appointment.selectedDay;
+    function findAvailableSlots(appointment: Form) {
+        const selectedDay: Date = appointment.selectedDay as Date;
         console.log(`Selected Day: ${selectedDay}`)
         const appointmentsAlreadyBooked: Appointment[] = appointment.appointmentsAlreadyBooked;
         if (appointmentsAlreadyBooked.length === 0) {
@@ -113,7 +112,7 @@ const FormComponent = ({
         const roster = await fetchBarberNextTwoWeeksRosters(value.uid);
         setAppointment(prevState => ({
             ...prevState,
-            barber: value,
+            barber: value.uid,
             roster: roster,
             dates: [],
             appointmentsAlreadyBooked: [],
@@ -152,7 +151,7 @@ const FormComponent = ({
 
     async function handleServiceChange(service: string) {
         setAppointment(prevState => {
-            const updatedAppointment = { ...prevState, service};
+            const updatedAppointment : Form = { ...prevState, service};
             if (appointment.roster && appointment.selectedDay) {
                 const availableTimes = findAvailableSlots(updatedAppointment);
                 return { ...updatedAppointment, avaliableTimes: availableTimes };

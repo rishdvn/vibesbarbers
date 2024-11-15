@@ -5,7 +5,7 @@ import { eachDayOfInterval, format, isSameDay } from 'date-fns';
 
 interface AppointmentDateProps {
     roster: Roster[];
-    selectedDay: Date;
+    selectedDay: Date | null;
     changeSelectedDay: (day: Date) => void;
 }
 

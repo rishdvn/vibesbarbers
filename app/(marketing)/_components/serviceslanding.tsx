@@ -1,5 +1,3 @@
-'use server';
-
 import React from 'react';
 import Link from 'next/link';
 
@@ -18,7 +16,7 @@ const services = [
     }
   ]
   
-  export default function ServicesLanding() {
+export default function ServicesLanding() {
   return (
     <div>
       <ul role="list" className="divide-y divide-gray-100">
