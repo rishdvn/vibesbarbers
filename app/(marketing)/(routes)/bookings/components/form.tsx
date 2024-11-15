@@ -14,7 +14,8 @@ import { useUserAuth } from "@/src/context/AuthContext";
 import PhoneNumber from "./phoneNumber";
 import { Form, FormSchema } from "@/utils/schemas/Form";
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-
+import BookButton from './bookButton';
+import { useService } from '@/app/context/ServiceContext';
 
 const SLOT_TIME = 20;
 
@@ -27,6 +28,7 @@ const FormComponent = ({
     }
 ) => {
     const { user, signUserOut } = useUserAuth();
+    
     const emptyAppointmentState: Form = {
         service: "",
         name: "",
@@ -39,9 +41,11 @@ const FormComponent = ({
         appointmentsAlreadyBooked: [],
         roster: []
     };
-    const [appointment, setAppointment] = useState<Form>(emptyAppointmentState);
-
     
+    const [appointment, setAppointment] = useState<Form>(emptyAppointmentState);
+    const [allowSubmit, setAllowSubmit] = useState(false);
+
+
     function findAvailableSlots(appointment: typeof FormSchema) {
         const selectedDay: Date = appointment.selectedDay;
         console.log(`Selected Day: ${selectedDay}`)
@@ -157,6 +161,11 @@ const FormComponent = ({
         });
     }
 
+    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        // Add your submission logic here
+        console.log('Submitting appointment:', appointment);
+    };
 
     return (
         <div className="text-xs flex flex-col gap-y-10 px-4 py-5">
@@ -181,6 +190,11 @@ const FormComponent = ({
                 appDetails={appointment} 
                 handleAppDetails={e => setAppointment(prev => ({...prev, telNo: e.target.value}))} 
                 signUserOut={signUserOut} 
+            />
+            <BookButton 
+                allowSubmit={allowSubmit}
+                appointment={appointment}
+                onSubmit={handleSubmit}
             />
             </>}
             

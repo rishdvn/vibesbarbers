@@ -1,3 +1,8 @@
+'use server';
+
+import React from 'react';
+import Link from 'next/link';
+
 const services = [
     {
       name: 'Haircut',
@@ -14,27 +19,26 @@ const services = [
   ]
   
   export default function ServicesLanding() {
-    return (
-      <div>
-        <ul role="list" className="divide-y divide-gray-100">
-          {services.map((service) => (
-            <li key={service.time} className=" flex items-center justify-between gap-x-6 py-5">
-              <div className="flex min-w-0 gap-x-4">
-                <div className="flex flex-col min-w-0 gap-y-1">
-                  <p className="text-md font-semibold leading-6 text-gray-900">{service.name}</p>
-                  <p className="mt-1 truncate text-sm leading-5 text-gray-500">{service.time}</p>
-                </div>
+  return (
+    <div>
+      <ul role="list" className="divide-y divide-gray-100">
+        {services.map((service) => (
+          <li key={service.time} className="flex items-center justify-between gap-x-6 py-5">
+            <div className="flex min-w-0 gap-x-4">
+              <div className="flex flex-col min-w-0 gap-y-1">
+                <p className="text-md font-semibold leading-6 text-gray-900">{service.name}</p>
+                <p className="mt-1 truncate text-sm leading-5 text-gray-500">{service.time}</p>
               </div>
-              <a
-                href="/booking"
-                className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-              >
-                Book now
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )
-  }
-  
+            </div>
+            <Link
+              href="/bookings"
+              className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+              Book now
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};

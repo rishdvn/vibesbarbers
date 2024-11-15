@@ -1,4 +1,4 @@
-"use server";
+'use server';
 
 import { fetchUsers } from "../booking/actions";
 import Header from "./components/header";
@@ -11,10 +11,6 @@ const SERVICES = {
 
 export default async function BookingPage() {
     const users = await fetchUsers();
-    // const rosters = await fetchRosters();
-    // const appointments = await fetchAllAppointments();
-
-    let barberUID: string;
 
     return (
     <div className='h-full flex flex-col items-center'>
