@@ -1,8 +1,11 @@
-import MultipleSchedule from "../../_components/multipleSchedule";
+import MultipleSchedule from "./components/MultipleSchedule";
+import { CalendarProvider } from "./context";
 
 const Calendar = () => {
     return (
-        <MultipleSchedule />
+        <CalendarProvider>
+            <MultipleSchedule />
+        </CalendarProvider>
     )
 };
 
