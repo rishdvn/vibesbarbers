@@ -47,7 +47,7 @@ const AppointmentDate: React.FC<AppointmentDateProps> = ({ roster, selectedDay, 
                     </div>
                 </label>
 
-                <div className='flex flex-row w-full overflow-x-auto border-b border-gray-200 pb-2 gap-x-4'>
+                <div className='flex flex-row w-full pl-5 overflow-x-auto border-b border-gray-200 pb-2 gap-x-4'>
                     {availableDays.length > 0 ? (
                         availableDays.map((dayObject) => (
                             <DayItem 

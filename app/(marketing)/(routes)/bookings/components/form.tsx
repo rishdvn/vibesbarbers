@@ -7,7 +7,7 @@ import Barber from "./barber";
 import Service from "./service";
 import { useEffect, useState } from "react";
 import AppointmentTime from "./appointmentTime";
-import { auth } from '@/src/index.ts'
+import { auth, db } from '@/src/index.ts'
 import { format } from "date-fns";
 import { TZDate } from "@date-fns/tz";
 import Name from "./name";
@@ -16,7 +16,7 @@ import PhoneNumber from "./phoneNumber";
 import { Form, FormSchema } from "@/utils/schemas/Form";
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import BookButton from './bookButton';
-import { Timestamp } from "firebase/firestore";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { DEFAULT_BUSINESS_HOURS } from '@/utils/time';
 
 const SLOT_TIME = 20;
@@ -58,7 +58,7 @@ const FormComponent = ({
         }
         const serviceDuration = services[appointment.service];
         const selectedRoster = appointment.roster[0]
-        const dayName = format(selectedDay, 'iiii').toLowerCase();
+        const dayName: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday' = format(selectedDay, 'iiii').toLowerCase() as 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
         console.log(dayName)
 
         const startOfDay = selectedRoster ? (() => {
@@ -97,8 +97,8 @@ const FormComponent = ({
             // Check if the slot is after current AEST time
             if (currentTime > currentAESTTime) {
                 const isSlotAvailable = !appointmentsAlreadyBooked.some(app => {
-                    const appStartTime = new TZDate(app.appStartTime, TIMEZONE);
-                    const appEndTime = new TZDate(app.appEndTime, TIMEZONE);
+                    const appStartTime = new TZDate(app.appStartTime as Date, TIMEZONE);
+                    const appEndTime = new TZDate(app.appEndTime as Date, TIMEZONE);
                     return (currentTime >= appStartTime && currentTime < appEndTime) || (slotEndTime > appStartTime && slotEndTime <= appEndTime);
                 });
 
@@ -169,7 +169,7 @@ const FormComponent = ({
         });
     }
 
-    async function publishToAppointments(appDetails) {
+    async function publishToAppointments(appDetails: Appointment) {
         try {
           const docRef = await addDoc(collection(db, "appointments"), {
             appDetails
@@ -182,7 +182,7 @@ const FormComponent = ({
     
     const [submited, setSubmited] = useState(false);
     
-    async function handleSubmit(e) {
+    async function handleSubmit(e: { preventDefault: () => void; }) {
         e.preventDefault();
         const appointmentToSubmit: Appointment = {
             service: appointment.service,
@@ -207,7 +207,7 @@ const FormComponent = ({
             
             {(appointment.roster && appointment.barber) && <AppointmentDate 
                 roster={appointment.roster} 
-                selectedDay={appointment.selectedDay} 
+                selectedDay={appointment.selectedDay as TZDate | null} 
                 changeSelectedDay={handleDateChange}
             />}
 
