@@ -17,6 +17,7 @@ import { Form, FormSchema } from "@/utils/schemas/Form";
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import BookButton from './bookButton';
 import { Timestamp } from "firebase/firestore";
+import { DEFAULT_BUSINESS_HOURS } from '@/utils/time';
 
 const SLOT_TIME = 20;
 const TIMEZONE = 'Australia/Sydney'; // AEST/AEDT timezone
@@ -68,8 +69,9 @@ const FormComponent = ({
             const hour = startTime.period === 'AM' ? parseInt(startTime.hour) : parseInt(startTime.hour) + 12;
             return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), hour, parseInt(startTime.min), 0, 0);
         })() : (() => {
-            console.log("Base case invoked: No selected roster, using default start time.");
-            return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), 9, 0, 0, 0);
+            console.log("Base case invoked: Using default business hours.");
+            const [hours, minutes] = DEFAULT_BUSINESS_HOURS[dayName].openTime.split(':');
+            return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), parseInt(hours), parseInt(minutes), 0, 0);
         })();
 
         const endOfDay = selectedRoster ? (() => {
@@ -78,8 +80,9 @@ const FormComponent = ({
             const hour = endTime.period === 'AM' ? parseInt(endTime.hour) : parseInt(endTime.hour) + 12;
             return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), hour, parseInt(endTime.min), 0, 0);
         })() : (() => {
-            console.log("Base case invoked: No selected roster, using default end time.");
-            return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), 17, 0, 0, 0);
+            console.log("Base case invoked: Using default business hours.");
+            const [hours, minutes] = DEFAULT_BUSINESS_HOURS[dayName].closeTime.split(':');
+            return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), parseInt(hours), parseInt(minutes), 0, 0);
         })();
 
         const availableSlots = [];
