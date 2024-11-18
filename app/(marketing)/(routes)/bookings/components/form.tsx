@@ -9,14 +9,17 @@ import { useEffect, useState } from "react";
 import AppointmentTime from "./appointmentTime";
 import { auth } from '@/src/index.ts'
 import { format } from "date-fns";
+import { TZDate } from "@date-fns/tz";
 import Name from "./name";
 import { useUserAuth } from "@/src/context/AuthContext";
 import PhoneNumber from "./phoneNumber";
 import { Form, FormSchema } from "@/utils/schemas/Form";
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import BookButton from './bookButton';
+import { Timestamp } from "firebase/firestore";
 
 const SLOT_TIME = 20;
+const TIMEZONE = 'Australia/Sydney'; // AEST/AEDT timezone
 
 const FormComponent = ({ 
         services, 
@@ -46,7 +49,7 @@ const FormComponent = ({
 
 
     function findAvailableSlots(appointment: Form) {
-        const selectedDay: Date = appointment.selectedDay as Date;
+        const selectedDay = new TZDate(appointment.selectedDay as Date, TIMEZONE);
         console.log(`Selected Day: ${selectedDay}`)
         const appointmentsAlreadyBooked: Appointment[] = appointment.appointmentsAlreadyBooked;
         if (appointmentsAlreadyBooked.length === 0) {
@@ -61,48 +64,51 @@ const FormComponent = ({
             const startTime = selectedRoster.selectedTimes[dayName].start_time;
             console.log(selectedRoster.selectedTimes)
             console.log(`Selected roster start time: ${startTime.hour}:${startTime.min} ${startTime.period}`);
-            return new Date(selectedDay).setHours(
-                startTime.period === 'AM' ? parseInt(startTime.hour) : parseInt(startTime.hour) + 12,
-                parseInt(startTime.min),
-                0,
-                0
-            );
+            // Create date in AEST/AEDT
+            const hour = startTime.period === 'AM' ? parseInt(startTime.hour) : parseInt(startTime.hour) + 12;
+            return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), hour, parseInt(startTime.min), 0, 0);
         })() : (() => {
             console.log("Base case invoked: No selected roster, using default start time.");
-            return new Date(selectedDay).setHours(9, 0, 0, 0);
+            return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), 9, 0, 0, 0);
         })();
 
         const endOfDay = selectedRoster ? (() => {
             const endTime = selectedRoster.selectedTimes[dayName].end_time;
             console.log(`Selected roster end time: ${endTime.hour}:${endTime.min} ${endTime.period}`);
-            return new Date(selectedDay).setHours(
-                endTime.period === 'AM' ? parseInt(endTime.hour) : parseInt(endTime.hour) + 12,
-                parseInt(endTime.min),
-                0,
-                0
-            );
+            const hour = endTime.period === 'AM' ? parseInt(endTime.hour) : parseInt(endTime.hour) + 12;
+            return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), hour, parseInt(endTime.min), 0, 0);
         })() : (() => {
             console.log("Base case invoked: No selected roster, using default end time.");
-            return new Date(selectedDay).setHours(17, 0, 0, 0);
+            return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), 17, 0, 0, 0);
         })();
 
         const availableSlots = [];
-        let currentTime = new Date(startOfDay);
+        let currentTime = startOfDay;
+        
+        // Get current time in AEST
+        const currentAESTTime = TZDate.tz(TIMEZONE, new Date());
 
         while (currentTime < endOfDay) {
-            const slotEndTime = new Date(currentTime.getTime() + SLOT_TIME * 60000);
+            const slotEndTime = new TZDate(currentTime.getTime() + SLOT_TIME * 60000, TIMEZONE);
 
-            const isSlotAvailable = !appointmentsAlreadyBooked.some(app => {
-                const appStartTime = new Date(app.appStartTime);
-                const appEndTime = new Date(app.appEndTime);
-                return (currentTime >= appStartTime && currentTime < appEndTime) || (slotEndTime > appStartTime && slotEndTime <= appEndTime);
-            });
+            // Check if the slot is after current AEST time
+            if (currentTime > currentAESTTime) {
+                const isSlotAvailable = !appointmentsAlreadyBooked.some(app => {
+                    const appStartTime = new TZDate(app.appStartTime, TIMEZONE);
+                    const appEndTime = new TZDate(app.appEndTime, TIMEZONE);
+                    return (currentTime >= appStartTime && currentTime < appEndTime) || (slotEndTime > appStartTime && slotEndTime <= appEndTime);
+                });
 
-            if (isSlotAvailable) {
-                availableSlots.push({ start: new Date(currentTime), end: new Date(slotEndTime) });
+                if (isSlotAvailable) {
+                    availableSlots.push({ 
+                        start: currentTime, 
+                        end: slotEndTime,
+                        displayTime: format(currentTime, "h:mm 'a' '(AEST)'")
+                    });
+                }
             }
 
-            currentTime = new Date(currentTime.getTime() + SLOT_TIME * 60000);
+            currentTime = new TZDate(currentTime.getTime() + SLOT_TIME * 60000, TIMEZONE);
         }
 
         return availableSlots;
@@ -142,7 +148,7 @@ const FormComponent = ({
         });
     }
 
-    async function handleTimeChange(time: {start: Date | null, end: Date | null}) {
+    async function handleTimeChange(time: {start: TZDate | null, end: TZDate | null}) {
         setAppointment(prevState => ({
             ...prevState,
             selectedTime: time
@@ -160,11 +166,34 @@ const FormComponent = ({
         });
     }
 
-    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    async function publishToAppointments(appDetails) {
+        try {
+          const docRef = await addDoc(collection(db, "appointments"), {
+            appDetails
+          });
+          console.log("Document written with ID: ", docRef.id);
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
+      }
+    
+    const [submited, setSubmited] = useState(false);
+    
+    async function handleSubmit(e) {
         e.preventDefault();
-        // Add your submission logic here
-        console.log('Submitting appointment:', appointment);
-    };
+        const appointmentToSubmit: Appointment = {
+            service: appointment.service,
+            barberUID: appointment.barber,
+            firstname: appointment.name,
+            telNo: appointment.telNo,
+            appDay: Timestamp.fromDate(appointment.selectedDay as TZDate),
+            appStartTime: Timestamp.fromDate(appointment.selectedTime.start as TZDate),
+            appEndTime: Timestamp.fromDate(appointment.selectedTime.end as TZDate),
+            isExtra: false // Set this based on your logic
+        };
+        await publishToAppointments(appointmentToSubmit);
+        setSubmited(true);
+    }
 
     return (
         <div className="text-xs flex flex-col gap-y-10 px-4 py-5">
