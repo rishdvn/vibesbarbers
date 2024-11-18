@@ -43,20 +43,42 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
                 }
             });
         }
-    }, [auth]);
-    
-    const handleSendOtp = async (e) => {
-        const formattedPhoneNumber = `+61${appDetails.telNo.replace(/\D/g, '')}`;
-        signInWithPhoneNumber(auth, formattedPhoneNumber, window.recaptchaVerifier).then(
-            (confirmationResult) => {
-                console.log("Got here")
-                setConfirmationResult(confirmationResult);
-                setOtpSent(true);
-                alert('OTP has been sent');
+
+        // Cleanup function
+        return () => {
+            if (window.recaptchaVerifier) {
+                window.recaptchaVerifier.clear();
+                window.recaptchaVerifier = null;
             }
-        ).catch((error) => {
-            console.error(error)
-        })
+        };
+    }, []);
+
+    const handleSendOtp = async (e) => {
+        try {
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'normal',
+                    'callback': (response) => {
+                        console.log(response);
+                    },
+                    'expired-callback': () => {
+                        console.log('expired');
+                    }
+                });
+            }
+            const formattedPhoneNumber = `+61${appDetails.telNo.replace(/\D/g, '')}`;
+            const confirmationResult = await signInWithPhoneNumber(auth, formattedPhoneNumber, window.recaptchaVerifier);
+            setConfirmationResult(confirmationResult);
+            setOtpSent(true);
+            alert('OTP has been sent');
+        } catch (error) {
+            console.error('Error sending OTP:', error);
+            // Reset reCAPTCHA on error
+            if (window.recaptchaVerifier) {
+                window.recaptchaVerifier.clear();
+                window.recaptchaVerifier = null;
+            }
+        }
     };
     
 
@@ -124,9 +146,9 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
           </div>
         </div>
       )}
-      {!verified && !otpSent ? (
-        <div id="recaptcha-container" />
-      ) : null}
+      {!user && !otpSent && (
+        <div id="recaptcha-container" className="mt-2" />
+      )}
       {otpSent && !verified ? (
         <div className='flex flex-row gap-x-1'>
           <input
