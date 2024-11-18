@@ -10,6 +10,7 @@ import AddBreak from './addbreak';
 import { useCalendar } from '../context';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src';
+import { User } from '@/utils/schemas/User';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -111,6 +112,19 @@ export default function MultipleSchedule() {
       })
       setPriceToggle(!priceToggle)
       console.log("Updated document ID:", appId);
+    }
+
+    const numberInputOnWheelPreventChange = (e: React.WheelEvent<HTMLInputElement>) => {
+      // Prevent the input value change
+      e.target.blur()
+
+      // Prevent the page/container scrolling
+      e.stopPropagation()
+
+      // Refocus immediately, on the next tick
+      setTimeout(() => {
+        e.target.focus()
+      }, 0)
     }
 
     // const [isChecked, setIsChecked] = useState(false);
@@ -270,6 +284,7 @@ export default function MultipleSchedule() {
                       <input
                         type="number"
                         onChange={(e) => setPriceObject({ ...priceObject, service: e.target.value })}
+                        onWheel={numberInputOnWheelPreventChange}
                         min="0"
                         className='p-2 w-full rounded-lg border border-gray-200'
                       />
@@ -280,6 +295,7 @@ export default function MultipleSchedule() {
                       <input
                         type="number"
                         onChange={(e) => setPriceObject({ ...priceObject, product: e.target.value })}
+                        onWheel={numberInputOnWheelPreventChange}
                         min="0"
                         className='p-2 w-full rounded-lg border border-gray-200'
                       />
@@ -388,6 +404,19 @@ export default function MultipleSchedule() {
       })
       setPriceToggle(!priceToggle)
       console.log("Updated document ID:", appId);
+    }
+
+    const numberInputOnWheelPreventChange = (e: React.WheelEvent<HTMLInputElement>) => {
+      // Prevent the input value change
+      e.target.blur()
+
+      // Prevent the page/container scrolling
+      e.stopPropagation()
+
+      // Refocus immediately, on the next tick
+      setTimeout(() => {
+        e.target.focus()
+      }, 0)
     }
 
     return (
@@ -517,6 +546,7 @@ export default function MultipleSchedule() {
                       <input
                         type="number"
                         onChange={(e) => setPriceObject({ ...priceObject, service: e.target.value })}
+                        onWheel={numberInputOnWheelPreventChange}
                         min="0"
                         className='p-2 w-full rounded-lg border border-gray-200'
                       />
@@ -527,6 +557,7 @@ export default function MultipleSchedule() {
                       <input
                         type="number"
                         onChange={(e) => setPriceObject({ ...priceObject, product: e.target.value })}
+                        onWheel={numberInputOnWheelPreventChange}
                         min="0"
                         className='p-2 w-full rounded-lg border border-gray-200'
                       />
@@ -598,7 +629,7 @@ export default function MultipleSchedule() {
     )
   }
 
-  const BarberItem = ({ keyValue, barber }: { keyValue: any, barber: object }) => {
+  const BarberItem = ({ keyValue, barber }: { keyValue: any, barber: User }) => {
     return (
       <div
         key={keyValue + Math.random()}
