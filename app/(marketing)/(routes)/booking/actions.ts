@@ -1,12 +1,11 @@
 'use server'
 
 import { db } from '@/src/index';
-import { Appointment } from '@/utils/schemas/Appointment';
+import { Appointment, AppointmentDoc } from '@/utils/schemas/Appointment';
 import { Roster, RosterCollection } from '@/utils/schemas/Roster';
 import { User } from '@/utils/schemas/User';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { areIntervalsOverlapping, endOfDay, format, isSameDay, startOfDay, addDays, eachDayOfInterval } from 'date-fns';
-
 
 export async function fetchUsers(): Promise<User[]> {
     const usersSnapshot = await getDocs(collection(db, "users"));
@@ -47,7 +46,16 @@ export async function fetchBarberDayRosters(uid: string, day: string): Promise<R
   const workingRosters: Roster[] = [];
   
   rostersSnapshot.forEach((doc) => {
-    workingRosters.push(doc.data() as Roster);
+    const data = doc.data() as Roster;
+    const simpleData = {
+      ...data,
+      selectedTimes: {
+        ...data.selectedTimes,
+        start: data.selectedTimes.start.toDate(),
+        end: data.selectedTimes.end.toDate()
+      }
+    };
+    workingRosters.push(simpleData);
   });
 
   console.log("Working Rosters Data Type:", Array.isArray(workingRosters) ? "Array" : typeof workingRosters, workingRosters);
@@ -90,16 +98,20 @@ export async function fetchBarberNextTwoWeeksRosters(uid: string): Promise<Roste
 }
 
 
-export async function fetchAllAppointments(): Promise<Appointment[]> {
+export async function fetchAllAppointments(): Promise<AppointmentDoc[]> {
   const appointmentsSnapshot = await getDocs(collection(db, "appointments"));
-  const appointments: Appointment[] = [];
-  
-  appointmentsSnapshot.forEach((doc) => {
-    appointments.push(doc.data() as Appointment);
+  return appointmentsSnapshot.docs.map(doc => {
+    const data = doc.data();
+    console.log(data)
+    return {
+      ...data,
+      appDetails: {
+        appDay: data.appDay.toDate().toISOString(),
+        appStartTime: data.appStartTime.toDate().toISOString(),
+        appEndTime: data.appEndTime.toDate().toISOString(),
+      }
+    } as AppointmentDoc;
   });
-
-  console.log("Appointments Data Type:", Array.isArray(appointments) ? "Array" : typeof appointments, appointments);
-  return appointments;
 }
 
 import { Timestamp } from 'firebase/firestore';
