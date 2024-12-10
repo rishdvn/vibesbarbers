@@ -141,7 +141,7 @@ export default function MultipleSchedule() {
         className="z-0 relative flex"
         style={{ gridRow: ` ${gridrow} / span ${span}` }}
       >
-        {!cancelToggle && !priceToggle && (
+        {!cancelToggle && (
           <Menu.Button as="div" className="flex items-start">
             <li
               key={appStart}
@@ -352,6 +352,8 @@ export default function MultipleSchedule() {
     const appService = appointment.appDetails.service
     const customerName = appointment.appDetails.firstname
     const customerTel = appointment.appDetails.telNo
+    const gridrow = (differenceInMinutes(appointment.appDetails.appStartTime, dayStart) / 20) + 1
+    const span = (differenceInMinutes(appointment.appDetails.appEndTime, appointment.appDetails.appStartTime) / 20)
     const isBreak = appointment.appDetails.service === "20 Minute Break" || appointment.appDetails.service === "40 Minute Break" || appointment.appDetails.service === "60 Minute Break"
     const priceExists = appointment.service ? true : false
     const tileColor = color ? color : "pink"
@@ -424,7 +426,7 @@ export default function MultipleSchedule() {
         as="div"
         className="z-0 relative flex flex-col gap-y-2"
       >
-        {!cancelToggle && !priceToggle && (
+        {!cancelToggle && (
           <Menu.Button as="div" className="flex ">
             <li
               key={appService + Math.random()}
