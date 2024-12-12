@@ -24,16 +24,18 @@ const TIMEZONE = 'Australia/Sydney'; // AEST/AEDT timezone
 
 const FormComponent = ({ 
         services, 
-        users 
+        users,
+        initialService
     }:{
         services: {[key: string]: number}; 
         users: any;
+        initialService?: string;
     }
 ) => {
     const { user, signUserOut } = useUserAuth();
     
     const emptyAppointmentState: Form = {
-        service: "",
+        service: initialService || "",
         name: "",
         barber: null,
         dates: [],

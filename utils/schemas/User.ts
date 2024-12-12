@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const UserSchema = z.object({
-  color: z.string(),
+  color: z.enum(['blue', 'red', 'pink', 'green', 'indigo', 'orange', 'yellow']),
   approved: z.boolean(),
   email: z.string().email(),
   firstname: z.string(),
