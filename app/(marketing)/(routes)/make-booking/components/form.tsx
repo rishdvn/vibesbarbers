@@ -65,6 +65,7 @@ const FormComponent = ({
         }
 
         const appointments = await fetchBarberDayAppointments(barberId, day);
+        console.log(`Fetched appointments for ${barberId} on ${dateKey}:`, appointments);
         appointmentsCache.current[cacheKey] = appointments;
         return appointments;
     };

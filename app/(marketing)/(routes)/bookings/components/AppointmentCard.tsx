@@ -1,16 +1,17 @@
 import { AppointmentDoc } from "@/utils/schemas/Appointment";
-import { getBarberById } from "@/utils/actions";
 import { User } from "@/utils/schemas/User";
+import { TZDate } from "@date-fns/tz";
+import { format } from "date-fns";
 
+const TIMEZONE = 'Australia/Sydney'; // AEST/AEDT timezone
 
 export default function AppointmentCard({ appointment, barbers }: { appointment: AppointmentDoc, barbers: { [key: string]: User } }) {
-    const appDate = new Date(appointment.appDetails.appDay as Date);
-    const startTime = new Date(appointment.appDetails.appStartTime as Date);
-    // const barberName = getBarberById(appointment.appDetails.barberUID);
-    const month = appDate.toLocaleString('default', { month: 'short' }).toUpperCase();
+    const appDate = new TZDate(appointment.appDetails.appDay as Date, TIMEZONE);
+    const startTime = new TZDate(appointment.appDetails.appStartTime as Date, TIMEZONE);
+    const month = format(appDate, 'MMM').toUpperCase();
     const day = appDate.getDate();
     const year = appDate.getFullYear();
-    const timeStr = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const timeStr = format(startTime, 'h:mm a');
   
     return (
       <div className="flex mb-4 rounded-lg overflow-hidden border border-gray-700">

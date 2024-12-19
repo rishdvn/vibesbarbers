@@ -6,6 +6,9 @@ import { Roster, RosterCollection } from '@/utils/schemas/Roster';
 import { User } from '@/utils/schemas/User';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { areIntervalsOverlapping, endOfDay, format, isSameDay, startOfDay, addDays, eachDayOfInterval, addHours } from 'date-fns';
+import { TZDate } from "@date-fns/tz";
+
+const TIMEZONE = 'Australia/Sydney'; // Define the timezone
 
 export async function fetchBarbers(): Promise<User[]> {
     const usersSnapshot = await getDocs(collection(db, "users"));
@@ -131,7 +134,6 @@ export async function fetchAllAppointments(): Promise<AppointmentDoc[]> {
 }
 
 import { Timestamp } from 'firebase/firestore';
-import { TZDate } from "@date-fns/tz";
 import App from 'next/app';
 
 
@@ -140,34 +142,47 @@ export async function fetchBarberDayAppointments(uid: string, day: TZDate): Prom
   const endOfDayTimestamp = Timestamp.fromDate(endOfDay(day));
   console.log(`Barber UID: ${uid}, day: ${format(day, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}`);
   console.log(`Start of Day: ${format(startOfDayTimestamp.toDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}`);
+  console.log(`End of Day: ${format(endOfDayTimestamp.toDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}`);
 
   const appointmentsQuery = query(
     collection(db, "appointments"),
     where("appDetails.barberUID", "==", uid),
-    where("appDetails.appDay", "==", startOfDayTimestamp),
+    where("appDetails.appDay", ">=", startOfDayTimestamp),
+    where("appDetails.appDay", "<", endOfDayTimestamp)
   );
 
   const appointmentsSnapshot = await getDocs(appointmentsQuery);
   const dayAppointments: Appointment[] = [];
-  
+
   appointmentsSnapshot.forEach((doc) => {
     const data = doc.data();
     // Convert Timestamp objects to ISO strings
     if (data) {
-      const appointment = {
-        ...data,
-        appDay: data.appDetails.appDay.toDate().toISOString(),
-      } as Appointment;
-      if (data.appDetails.appStartTime) {
-        appointment.appStartTime = data.appDetails.appStartTime.toDate().toISOString();
+      const appDay = data.appDetails.appDay.toDate();
+      const tzAppDay = new TZDate(appDay, TIMEZONE);
+      
+      // Only include appointments that fall on the requested day in the timezone
+      if (format(tzAppDay, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')) {
+        const appointment = {
+          ...data.appDetails,
+          appDay: data.appDetails.appDay.toDate().toISOString(),
+        } as Appointment;
+        
+        if (data.appDetails.appStartTime) {
+          appointment.appStartTime = data.appDetails.appStartTime instanceof Timestamp 
+            ? data.appDetails.appStartTime.toDate().toISOString() 
+            : data.appDetails.appStartTime;
+        }
+        if (data.appDetails.appEndTime) {
+          appointment.appEndTime = data.appDetails.appEndTime instanceof Timestamp 
+            ? data.appDetails.appEndTime.toDate().toISOString() 
+            : data.appDetails.appEndTime;
+        }
+        dayAppointments.push(appointment);
       }
-      if (data.appDetails.appEndTime) {
-        appointment.appEndTime = data.appDetails.appEndTime.toDate().toISOString();
-      }
-      dayAppointments.push(appointment);
     }
   });
 
-  // console.log("Day Appointments:", dayAppointments);
+  console.log("Day Appointments:", dayAppointments);
   return dayAppointments;
 }

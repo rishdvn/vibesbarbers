@@ -1,7 +1,7 @@
 
 import { db } from '@/src/index';
 import { AppointmentDoc } from '@/utils/schemas/Appointment';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, Timestamp, where } from 'firebase/firestore';
 
 export async function fetchAppointmentsByPhoneNumber(phoneNumber: string): Promise<AppointmentDoc[]> {
   const appointmentsQuery = query(
@@ -12,13 +12,14 @@ export async function fetchAppointmentsByPhoneNumber(phoneNumber: string): Promi
   return appointmentsSnapshot.docs.map(doc => {
     const data = doc.data();
     console.log(data);
+    
     return {
       ...data,
       appDetails: {
         ...data.appDetails,
-        appDay: data.appDetails.appDay.toDate().toISOString(),
-        appStartTime: data.appDetails.appStartTime.toDate().toISOString(),
-        appEndTime: data.appDetails.appEndTime.toDate().toISOString(),
+        appDay: data.appDetails.appDay instanceof Timestamp ? data.appDetails.appDay.toDate().toISOString() : data.appDetails.appDay,
+        appStartTime: data.appDetails.appStartTime instanceof Timestamp ? data.appDetails.appStartTime.toDate().toISOString() : data.appDetails.appStartTime,
+        appEndTime: data.appDetails.appEndTime instanceof Timestamp ? data.appDetails.appEndTime.toDate().toISOString() : data.appDetails.appEndTime,
         telNo: data.appDetails.telNo
       }
     } as AppointmentDoc;
