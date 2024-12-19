@@ -1,7 +1,7 @@
 "use client";
 
 import { Appointment } from "@/utils/schemas/Appointment";
-import { fetchBarberDayAppointments, fetchBarberNextTwoWeeksRosters } from "../../../../../utils/actions";
+import { fetchBarberDayAppointments, fetchBarberNextTwoWeeksRosters } from "@/utils/actions";
 import AppointmentDate from "./appointmentDate";
 import Barber from "./barber";
 import Service from "./service";

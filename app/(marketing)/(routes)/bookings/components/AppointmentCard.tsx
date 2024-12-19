@@ -6,7 +6,7 @@ import { format } from "date-fns";
 const TIMEZONE = 'Australia/Sydney'; // AEST/AEDT timezone
 
 export default function AppointmentCard({ appointment, barbers }: { appointment: AppointmentDoc, barbers: { [key: string]: User } }) {
-    const appDate = new TZDate(appointment.appDetails.appDay as Date, TIMEZONE);
+    const appDate = new TZDate(appointment.appDetails.appStartTime as Date, TIMEZONE);
     const startTime = new TZDate(appointment.appDetails.appStartTime as Date, TIMEZONE);
     const month = format(appDate, 'MMM').toUpperCase();
     const day = appDate.getDate();

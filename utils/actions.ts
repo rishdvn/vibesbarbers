@@ -147,8 +147,8 @@ export async function fetchBarberDayAppointments(uid: string, day: TZDate): Prom
   const appointmentsQuery = query(
     collection(db, "appointments"),
     where("appDetails.barberUID", "==", uid),
-    where("appDetails.appDay", ">=", startOfDayTimestamp),
-    where("appDetails.appDay", "<", endOfDayTimestamp)
+    where("appDetails.appStartTime", ">=", startOfDayTimestamp),
+    where("appDetails.appStartTime", "<", endOfDayTimestamp)
   );
 
   const appointmentsSnapshot = await getDocs(appointmentsQuery);
@@ -158,16 +158,16 @@ export async function fetchBarberDayAppointments(uid: string, day: TZDate): Prom
     const data = doc.data();
     // Convert Timestamp objects to ISO strings
     if (data) {
-      const appDay = data.appDetails.appDay.toDate();
+      const appDay = data.appDetails.appStartTime.toDate();
       const tzAppDay = new TZDate(appDay, TIMEZONE);
       
       // Only include appointments that fall on the requested day in the timezone
       if (format(tzAppDay, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')) {
         const appointment = {
           ...data.appDetails,
-          appDay: data.appDetails.appDay.toDate().toISOString(),
+          appDay: data.appDetails.appStartTime.toDate().toISOString(),
         } as Appointment;
-        
+
         if (data.appDetails.appStartTime) {
           appointment.appStartTime = data.appDetails.appStartTime instanceof Timestamp 
             ? data.appDetails.appStartTime.toDate().toISOString() 
@@ -178,6 +178,7 @@ export async function fetchBarberDayAppointments(uid: string, day: TZDate): Prom
             ? data.appDetails.appEndTime.toDate().toISOString() 
             : data.appDetails.appEndTime;
         }
+        
         dayAppointments.push(appointment);
       }
     }

@@ -118,8 +118,8 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
 
       const q = query(
         collection(db, "appointments"),
-        where("appDetails.appDay", ">=", dayStart),
-        where("appDetails.appDay", "<=", dayEnd)
+        where("appDetails.appStartTime", ">=", dayStart),
+        where("appDetails.appStartTime", "<=", dayEnd)
       );
 
       const unsubscribe = onSnapshot(q, {

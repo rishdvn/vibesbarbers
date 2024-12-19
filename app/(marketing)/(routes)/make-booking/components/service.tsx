@@ -35,7 +35,6 @@ const Service: React.FC<ServiceProps> = ({ service, onChange, services }) => {
                             onClick={() => onChange(serviceKey)}
                         >
                             <span>{serviceKey}</span>
-                            <span className="text-sm font-normal">${services[serviceKey]}</span>
                         </div>
                     ))}
                 </div>
