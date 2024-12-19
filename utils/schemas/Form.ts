@@ -4,7 +4,8 @@ import { RosterSchema } from './Roster';
 
 export const FormSchema = z.object({
   service: z.string(),
-  name: z.string(),
+  firstname: z.string(),
+  lastname: z.string(),
   barber: z.any().nullable(),
   dates: z.array(z.any()),
   telNo: z.string(),

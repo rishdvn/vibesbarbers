@@ -13,6 +13,7 @@ export const AppointmentSchema = z.object({
   service: z.string(),
   barberUID: z.string(),
   firstname: z.string(),
+  lastname: z.string(),
   telNo: z.string(),
   appDay: dateSchema,
   appStartTime: dateSchema,

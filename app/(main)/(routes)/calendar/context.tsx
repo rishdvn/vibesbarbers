@@ -34,6 +34,7 @@ interface CalendarContextType {
   updateAppointment: (id: string, updates: Partial<AppointmentDoc>) => Promise<void>;
   deleteAppointment: (id: string) => Promise<void>;
   timeAppointmentBarberMap: Map<string, Map<string, AppointmentDoc | null>>;
+  isLoading: boolean;
 }
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined);
@@ -48,6 +49,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   const [barbers, setBarbers] = useState<User[]>([]);
   const [appointments, setAppointments] = useState<AppointmentDoc[]>([]);
   const [rosters, setRosters] = useState<Record<string, Roster>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   // Utility function to ensure we always have a Date object
   const ensureDate = (value: Date | Timestamp | null | undefined): Date | null => {
@@ -77,6 +79,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
 
   // Fetch barbers
   useEffect(() => {
+    setIsLoading(true);
     try {
       const q = query(
         collection(db, "users"),
@@ -88,20 +91,24 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
         next: (snapshot) => {
           const barbersList = snapshot.docs.map(doc => doc.data() as User);
           setBarbers(barbersList);
+          setIsLoading(false);
         },
         error: (error) => {
           console.error("Error fetching barbers:", error);
+          setIsLoading(false);
         }
       });
 
       return () => unsubscribe();
     } catch (error) {
       console.error("Error setting up barbers listener:", error);
+      setIsLoading(false);
     }
   }, []);
 
   // Fetch appointments for selected day
   useEffect(() => {
+    setIsLoading(true);
     try {
       // Create start and end of selected day
       const dayStart = new Date(selectedDay);
@@ -133,20 +140,24 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
             } as AppointmentDoc;
           });
           setAppointments(appointmentsList);
+          setIsLoading(false);
         },
         error: (error) => {
           console.error("Error fetching appointments:", error);
+          setIsLoading(false);
         }
       });
 
       return () => unsubscribe();
     } catch (error) {
       console.error("Error setting up appointments listener:", error);
+      setIsLoading(false);
     }
   }, [selectedDay]);
 
   // Fetch rosters
   useEffect(() => {
+    setIsLoading(true);
     try {
       const unsubscribe = onSnapshot(collection(db, "roster"), {
         next: (snapshot) => {
@@ -155,15 +166,18 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
             rostersMap[doc.id] = doc.data() as Roster;
           });
           setRosters(rostersMap);
+          setIsLoading(false);
         },
         error: (error) => {
           console.error("Error fetching rosters:", error);
+          setIsLoading(false);
         }
       });
 
       return () => unsubscribe();
     } catch (error) {
       console.error("Error setting up rosters listener:", error);
+      setIsLoading(false);
     }
   }, []);
 
@@ -327,6 +341,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     updateAppointment,
     deleteAppointment,
     timeAppointmentBarberMap,
+    isLoading
   };
 
   return (

@@ -27,7 +27,8 @@ export default function MultipleSchedule() {
     appointments,
     selectedDayAppointments: selectedDayApps,
     workingBarbers,
-    rosters
+    rosters,
+    isLoading
   } = useCalendar();
 
   const times: { [key: string]: string[] } = {
@@ -740,16 +741,16 @@ export default function MultipleSchedule() {
       </header>
 
       {/* Calendar */}
-      {workingBarbers.length === 0 ? (
-        <div
-          className='flex flex-row items-center justify-center text-sm p-2'
-        >
+      {isLoading ? (
+        <div className='flex flex-row items-center justify-center text-sm p-2'>
+          Loading calendar data...
+        </div>
+      ) : workingBarbers.length === 0 ? (
+        <div className='flex flex-row items-center justify-center text-sm p-2'>
           {`${view === "Team" ? "No barbers are" : "You are not"} working on this day. Roster work to add appointments.`}
         </div>
-      ) :
-        <div
-          className='flex flex-row h-20 flex-grow w-full items-start overflow-y-auto overflow-x-auto'
-        >
+      ) : (
+        <div className='flex flex-row h-20 flex-grow w-full items-start overflow-y-auto overflow-x-auto'>
           {/* Showcase of times */}
           <div className="sticky left-0 flex flex-col z-20 w-11 bg-white border-r border-gray-100">
             <div
@@ -871,7 +872,7 @@ export default function MultipleSchedule() {
             )
           })}
         </div>
-      }
+      )}
       </div>
 
   )
