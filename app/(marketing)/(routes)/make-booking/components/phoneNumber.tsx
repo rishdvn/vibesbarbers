@@ -28,7 +28,7 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
     const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
     const [otpSent, setOtpSent] = useState(false);
     const [verified, setVerified] = useState(false);
-    
+    const [error, setError] = useState('');
 
     
     useEffect(() => {
@@ -72,7 +72,8 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
         }
     }, [user?.phoneNumber]);
 
-    const handleSendOtp = async (e) => {
+    const handleSendOtp = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
         try {
             if (!window.recaptchaVerifier) {
                 window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
@@ -92,6 +93,7 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
             alert('OTP has been sent');
         } catch (error) {
             console.error('Error sending OTP:', error);
+            setError(error.message)
             // Reset reCAPTCHA on error
             if (window.recaptchaVerifier) {
                 window.recaptchaVerifier.clear();
@@ -102,6 +104,7 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
     
 
     const handleOTPSubmit = async (e: any) => {
+      e.preventDefault();
         confirmationResult.confirm(otp).then((result) => {
             const user = result.user;
             setVerified(true);
@@ -157,6 +160,7 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
             />
             {otpSent ? null : (
               <button
+                type="button"
                 onClick={handleSendOtp}
                 className="bg-green-700 h-full w-1/4 flex items-center justify-center text-gray-100 px-4 rounded-md hover:bg-green-800 disabled:opacity-50 disabled:bg-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-all duration-300"
                 disabled={!appDetails.telNo || appDetails.telNo.length !== 9}
@@ -181,7 +185,7 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
           />
           <div
             onClick={handleOTPSubmit}
-            className="bg-green-700 text-gray-100 px-4 rounded-md hover:bg-green-800 disabled:opacity-50 disabled:bg-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed"
+            className="bg-green-700 h-full w-1/4 flex items-center justify-center text-gray-100 px-4 rounded-md hover:bg-green-800 disabled:opacity-50 disabled:bg-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-all duration-300"
             disabled={!otp || otp.length !== 6}
           >
             Submit OTP
@@ -196,6 +200,11 @@ const PhoneNumber: React.FC<PhoneNumberProps> = ({
       <div className='text-gray-400 font-medium'>
         This is only for verification purposes. The barber will contact you on this number if they are sick. You will not be sent any marketing SMS, and this number will not be shared.
       </div>
+      {error && (
+        <div className='text-red-600 font-medium'>
+          {error}
+        </div>
+      )}
       {!user && (
         <>
           {appDetails.telNo.length !== 9 && appDetails.telNo.length !== 0 && (
