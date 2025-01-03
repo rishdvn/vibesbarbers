@@ -39,7 +39,7 @@ const BarberLanding = () => {
           </Link>
           {user ? (
             <div className="flex items-center space-x-2">
-              {user.photoURL ? (
+              {/* {user.photoURL ? (
                 <img 
                   src={user.photoURL} 
                   alt="Profile" 
@@ -49,7 +49,7 @@ const BarberLanding = () => {
                 <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
                   {user.email?.[0]?.toUpperCase() || 'U'}
                 </div>
-              )}
+              )} */}
               <button 
                 onClick={() => signOut(auth)}
                 className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
@@ -88,7 +88,7 @@ const BarberLanding = () => {
             {/* Tagline and CTA */}
             <div className="text-center">
               <p className="text-xl mb-6">Where passion meets quality</p>
-              <Link href="/make-booking">
+              <Link href={user ? "/make-booking" : "/login"}>
                 <button className="bg-white text-black px-8 py-3 rounded-md font-bold hover:bg-gray-200 transition-colors">
                   BOOK NOW
                 </button>

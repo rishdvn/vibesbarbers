@@ -322,12 +322,12 @@ const FormComponent = ({
                     lastname: newValue.lastname
                 }))}
             />
-            <PhoneNumber 
+            {/* <PhoneNumber 
                 user={user} 
                 appDetails={appointment} 
                 handleAppDetails={e => {setAppointment(prev => ({...prev, telNo: e.target.value}))}} 
                 signUserOut={signUserOut} 
-            />
+            /> */}
             <BookButton 
                 allowSubmit={Boolean(appointment.selectedTime.start && appointment.selectedTime.end && appointment.firstname && appointment.lastname && appointment.telNo)}
                 onSubmit={handleSubmit}

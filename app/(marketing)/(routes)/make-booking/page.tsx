@@ -15,6 +15,7 @@ export default async function BookingPage({
 }: {
     searchParams: { [key: string]: string | string[] | undefined }
 }) {
+
     const barbers = await fetchBarbers();
     const selectedService = searchParams.service as string;
 
