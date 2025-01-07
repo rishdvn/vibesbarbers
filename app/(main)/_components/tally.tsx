@@ -60,8 +60,10 @@ export default function TallyPage() {
             }
         } else {
             // else filter based on appStartTime
-            if (isSameDay(app.appDetails.appStartTime.toDate(), selectedDay)) {
-            tempApps.push(app)
+            if(app.appDetails.appStartTime) {
+                if (isSameDay(app.appDetails.appStartTime.toDate(), selectedDay)) {
+                tempApps.push(app)
+                }
             }
         }
         }
