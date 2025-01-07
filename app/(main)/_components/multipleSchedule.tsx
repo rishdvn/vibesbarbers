@@ -65,11 +65,21 @@ export default function MultipleSchedule() {
         }
       } else {
         // else filter based on appStartTime
-        if (isSameDay(app.appDetails.appStartTime.toDate(), selectedDay)) {
-          tempApps.push(app)
+        if ((typeof app.appDetails.appStartTime === "object")) {
+          if (isSameDay(appStartTime.toDate(), selectedDay)) {
+            console.log(appStartTime.toDate(), selectedDay)
+            tempApps.push(app)
+          }
+        } else {
+          console.log(app)
         }
+        // console.log(app.appDetails.appStartTime.toDate())
+        // if (isSameDay(app.appDetails.appStartTime.toDate(), selectedDay)) {
+        //   tempApps.push(app)
+        // }
       }
     }
+    console.log("tempApps", tempApps)
     setSelectedDayApps(tempApps)
   },[selectedDay, appointments])
 
