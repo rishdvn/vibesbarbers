@@ -67,6 +67,9 @@ const FormComponent = ({
         }
     }, [user]);
 
+    console.log("Current UTC Time:", new Date().toISOString());
+    console.log("Australia/Sydney Time:", TZDate.tz(TIMEZONE, new Date()));
+
     const fetchAvailableBarbers = async () => {
         if (!appointment.service) return;
 
@@ -84,6 +87,10 @@ const FormComponent = ({
 
                 // Check each day in the roster for available slots
                 for (const rosterItem of roster) {
+                    console.log("rosterItem", rosterItem)
+                    console.log("rosterItem.selectedTimes", rosterItem.selectedTimes)
+                    console.log("rosterStart", rosterItem.selectedTimes.start)
+                    console.log("rosterStart", new TZDate(rosterItem.selectedTimes.start, TIMEZONE))
                     const rosterStart = new TZDate(rosterItem.selectedTimes.start, TIMEZONE);
                     const rosterEnd = rosterItem.selectedTimes.end !== "Never" 
                         ? new TZDate(rosterItem.selectedTimes.end, TIMEZONE) 
