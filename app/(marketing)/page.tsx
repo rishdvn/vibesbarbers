@@ -37,19 +37,8 @@ const BarberLanding = () => {
           >
             <Icon icon={instagram} size={24} />
           </Link>
-          {user ? (
+          {/* {user ? (
             <div className="flex items-center space-x-2">
-              {/* {user.photoURL ? (
-                <img 
-                  src={user.photoURL} 
-                  alt="Profile" 
-                  className="h-8 w-8 rounded-full"
-                />
-              ) : (
-                <div className="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center">
-                  {user.email?.[0]?.toUpperCase() || 'U'}
-                </div>
-              )} */}
               <button 
                 onClick={() => signOut(auth)}
                 className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200"
@@ -63,7 +52,7 @@ const BarberLanding = () => {
                 LOGIN
               </button>
             </Link>
-          )}
+          )} */}
         </div>
       </nav>
 
@@ -88,7 +77,8 @@ const BarberLanding = () => {
             {/* Tagline and CTA */}
             <div className="text-center">
               <p className="text-xl mb-6">Where passion meets quality</p>
-              <Link href={user ? "/make-booking" : "/login"}>
+              The site is currently under construction. Please check back later.
+              {/* <Link href={user ? "/make-booking" : "/login"}>
                 <button className="bg-white text-black px-8 py-3 rounded-md font-bold hover:bg-gray-200 transition-colors">
                   BOOK NOW
                 </button>
@@ -99,7 +89,7 @@ const BarberLanding = () => {
                     BOOKINGS
                   </button>
                 </Link>
-              )}
+              )} */}
             </div>
 
             {/* Reviews */}
