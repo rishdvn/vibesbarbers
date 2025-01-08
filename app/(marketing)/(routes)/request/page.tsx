@@ -52,7 +52,6 @@ const RequestPage = () => {
   // submission action
     async function handleSubmit(e) {
         e.preventDefault(); 
-        console.log("im rnning")
         const userRef = doc(db, "users", userDocId)
         await updateDoc(userRef, userCredentials)
         setSubmitted(true)

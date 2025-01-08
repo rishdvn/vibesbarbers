@@ -2,13 +2,15 @@
 
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid'
-import { Menu } from '@headlessui/react'
+import { Menu, Dialog } from '@headlessui/react'
 import { add, addDays, addHours, addMinutes, areIntervalsOverlapping, differenceInMinutes, eachDayOfInterval, endOfDay, endOfMonth, endOfWeek, format, formatDistance, getDay, isEqual, isSameDay, isSameMonth, parse, parseISO, set, startOfDay, startOfWeek } from 'date-fns';
-import { collection, onSnapshot, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/src';
 import { useUserAuth } from '@/src/context/AuthContext';
 import AddAppointment from './addappointment';
 import AddBreak from './addbreak';
+import { useCalendar } from '../context';
+import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/src';
+import { User } from '@/utils/schemas/User';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -16,171 +18,18 @@ function classNames(...classes) {
 
 export default function MultipleSchedule() {
   const { user } = useUserAuth();
-
-  // set view
-  const [view, setView] = useState('Team');
-
-  // fetch all approved Barbers
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    onSnapshot(collection(db, "users"), (querySnapshot) => {
-      const usersFetched = [];
-      querySnapshot.forEach((doc) => {
-        if (doc.data().approved === true && (doc.data().role === 'Barber' || doc.data().role === 'Admin')) {
-          usersFetched.push(doc.data());
-        }
-      });
-      setUsers(usersFetched);
-    })
-  }, [])
-
-  // fetch all appointments
-  const [appointments, setAppointments] = useState([]);
-
-  useEffect(() => {
-    onSnapshot(collection(db, "appointments"), (querySnapshot) => {
-      const tempApps = []
-      querySnapshot.forEach((doc) => {
-        const objWithId = { ...doc.data(), id: doc.id }
-        tempApps.push(objWithId);
-      });
-      setAppointments(tempApps);
-    })
-  }, [])
-
-  const today = startOfDay(new Date())
-  const [selectedDay, setSelectedDay] = useState(today);
-
-  // find relevant (occur on selected day) appointments based on the start-time OR appDay (based on isExtra!)
-  const [selectedDayApps, setSelectedDayApps] = useState(null);
-
-  useEffect(() => {
-    const tempApps = []
-    for (let app of appointments) {
-      // if isExtra is set to true, filter based on appDay
-      if (app.appDetails.isExtra) {
-        if (isSameDay(app.appDetails.appDay.toDate(), selectedDay)) {
-          tempApps.push(app)
-        }
-      } else {
-        // else filter based on appStartTime
-        if (app.appDetails.appStartTime) {
-          if ((typeof app.appDetails.appStartTime === "object")) {
-            if (isSameDay(app.appDetails.appStartTime.toDate(), selectedDay)) {
-              tempApps.push(app)
-            }
-          }
-        }
-        // console.log(app.appDetails.appStartTime.toDate())
-        // if (isSameDay(app.appDetails.appStartTime.toDate(), selectedDay)) {
-        //   tempApps.push(app)
-        // }
-      }
-    }
-    console.log("tempApps", tempApps)
-    setSelectedDayApps(tempApps)
-  }, [selectedDay, appointments])
-
-  // fetch all rosters
-  const [rosters, setRosters] = useState(null);
-
-  useEffect(() => {
-    onSnapshot(collection(db, "roster"), (querySnapshot) => {
-      const rostersFetched = {};
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        rostersFetched[doc.id] = data;
-      });
-      setRosters(rostersFetched);
-    });
-  }, [])
-
-  // find barbers working on selected day
-  const [workingBarbers, setWorkingBarbers] = useState([]);
-
-  useEffect(() => {
-    const tempWorkingBarbers = []
-
-    for (let barber of users) {
-      // find barber rosters
-      const barberRosters = []
-      if (rosters) {
-        for (let key in rosters) {
-          const roster = rosters[key];
-          if (roster.uid === barber.uid) {
-            barberRosters.push(roster)
-          }
-        }
-      }
-
-      // determine if working on selected day
-      let dayIsWorking;
-      for (let roster of barberRosters) {
-        const rosterInfo = roster.selectedTimes
-        const rosterStartTime = rosterInfo.start;
-        const rosterEndTime = rosterInfo.end;
-        // determine if overlaps exists, and if so, check if working that day
-        // if rostered end time is a date
-        if (!(rosterEndTime === "Never")) {
-          // if selected time overlaps with rostered time
-          if (areIntervalsOverlapping({ start: selectedDay, end: endOfDay(selectedDay) }, { start: rosterStartTime.toDate(), end: rosterEndTime.toDate() })) {
-            // check if working
-            const dayWeekDay = format(selectedDay, 'iiii').toLowerCase()
-            if (rosterInfo[dayWeekDay].isWorking) {
-              dayIsWorking = true;
-            } else {
-              dayIsWorking = false;
-            }
-          }
-          // if rostered end time is indefinite
-        } else {
-          // check for overlap with rostered schedule
-          if ((selectedDay < rosterStartTime.toDate() || isSameDay(selectedDay, rosterStartTime.toDate())) && endOfDay(selectedDay) > rosterStartTime.toDate() ||
-            (selectedDay > rosterStartTime.toDate())) {
-            // check if working
-            const dayWeekDay = format(selectedDay, 'iiii').toLowerCase()
-            if (rosterInfo[dayWeekDay].isWorking) {
-              dayIsWorking = true;
-            } else {
-              dayIsWorking = false;
-            }
-          }
-        }
-      }
-
-      // even if not rosterd to work, add if they have an extra appointment!!
-      for (let app of selectedDayApps) {
-        if (app.appDetails.barberUID === barber.uid && app.appDetails.isExtra) {
-          dayIsWorking = true;
-        }
-      }
-
-      if (dayIsWorking) {
-        tempWorkingBarbers.push(barber)
-      }
-
-      let tempIndividualBarber = []
-      // if individual view, filter for user logged in
-      for (let barber of tempWorkingBarbers) {
-        if (user) {
-          if (barber.uid === user.uid) {
-            tempIndividualBarber.push(barber)
-          }
-        }
-      }
-
-      // if individual view, set workingBarbers to tempIndividualBarber
-      // if team view, set workingBarbers to tempWorkingBarbers
-
-      if (view === "Individual") {
-        setWorkingBarbers(tempIndividualBarber)
-      } else {
-        setWorkingBarbers(tempWorkingBarbers)
-      }
-    }
-
-  }, [rosters, selectedDay, users, appointments, selectedDayApps, view, user])
+  const { 
+    view, 
+    setView, 
+    selectedDay, 
+    setSelectedDay,
+    barbers: users,
+    appointments,
+    selectedDayAppointments: selectedDayApps,
+    workingBarbers,
+    rosters,
+    isLoading
+  } = useCalendar();
 
   const times: { [key: string]: string[] } = {
     "monday": ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10PM', '11PM'],
@@ -194,6 +43,8 @@ export default function MultipleSchedule() {
 
   let dayTiming = times[`${format(selectedDay, 'EEEE').toLowerCase()}`]
   let daySlots = (dayTiming.length - 1) * 3
+  const today = startOfDay(new Date())
+
 
   const CalendarItem = ({ appointmentObject, color }) => {
     const appointment = appointmentObject;
@@ -203,8 +54,8 @@ export default function MultipleSchedule() {
     } else {
       dayStart = addHours(startOfDay(selectedDay), 9)
     }
-    const appStart = appointment.appDetails.appStartTime.toDate()
-    const appEnd = appointment.appDetails.appEndTime.toDate()
+    const appStart = appointment.appDetails.appStartTime
+    const appEnd = appointment.appDetails.appEndTime
     const appService = appointment.appDetails.service
     const customerName = appointment.appDetails.firstname
     const customerTel = appointment.appDetails.telNo
@@ -264,6 +115,19 @@ export default function MultipleSchedule() {
       console.log("Updated document ID:", appId);
     }
 
+    const numberInputOnWheelPreventChange = (e: React.WheelEvent<HTMLInputElement>) => {
+      // Prevent the input value change
+      e.target.blur()
+
+      // Prevent the page/container scrolling
+      e.stopPropagation()
+
+      // Refocus immediately, on the next tick
+      setTimeout(() => {
+        e.target.focus()
+      }, 0)
+    }
+
     // const [isChecked, setIsChecked] = useState(false);
 
     async function handleCheckedPublish() {
@@ -278,7 +142,7 @@ export default function MultipleSchedule() {
         className="z-0 relative flex"
         style={{ gridRow: ` ${gridrow} / span ${span}` }}
       >
-        {!cancelToggle && !priceToggle && (
+        {!cancelToggle && (
           <Menu.Button as="div" className="flex items-start">
             <li
               key={appStart}
@@ -401,57 +265,66 @@ export default function MultipleSchedule() {
           </div>
         )}
         {priceToggle && (
-          <div
-            className='items-start bg-gray-100 select-none group absolute inset-1 flex flex-col gap-y-2 rounded-lg p-2 text-xs leading-5 overflow-auto'
+          <Dialog
+            as="div"
+            className="relative z-50"
+            onClose={() => setPriceToggle(false)}
+            open={priceToggle}
           >
-            <div
-              className='flex w-full items-center flex-row gap-x-2 font-medium'
-            >
-              <div>
-                Service
-              </div>
-              <input
-                type="number"
-                onChange={(e) => setPriceObject({ ...priceObject, service: e.target.value })}
-                min="0"
-                className='p-1 w-full rounded-lg border border-gray-200 font-normal'
-              />
+            <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+              <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-white">
+                <div className='flex flex-col gap-y-4 p-6'>
+                  <Dialog.Title className="text-lg font-medium">
+                    Enter Price Details
+                  </Dialog.Title>
+
+                  <div className='flex flex-col gap-y-4'>
+                    <div className='flex items-center gap-x-2'>
+                      <label className="font-medium">Service</label>
+                      <input
+                        type="number"
+                        onChange={(e) => setPriceObject({ ...priceObject, service: e.target.value })}
+                        onWheel={numberInputOnWheelPreventChange}
+                        min="0"
+                        className='p-2 w-full rounded-lg border border-gray-200'
+                      />
+                    </div>
+
+                    <div className='flex items-center gap-x-2'>
+                      <label className="font-medium">Product</label>
+                      <input
+                        type="number"
+                        onChange={(e) => setPriceObject({ ...priceObject, product: e.target.value })}
+                        onWheel={numberInputOnWheelPreventChange}
+                        min="0"
+                        className='p-2 w-full rounded-lg border border-gray-200'
+                      />
+                    </div>
+                  </div>
+
+                  <div className='flex justify-end gap-x-2 mt-2'>
+                    <button
+                      className="rounded-md bg-white px-3 py-2 text-sm font-semibold border hover:bg-gray-50"
+                      onClick={() => setPriceToggle(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      disabled={!allowPriceSubmit}
+                      className={classNames(
+                        "rounded-md px-3 py-2 text-sm font-semibold",
+                        allowPriceSubmit ? "bg-green-200 hover:bg-green-300" : "text-gray-400 cursor-not-allowed bg-gray-200"
+                      )}
+                      onClick={handlePricePublish}
+                    >
+                      Save price
+                    </button>
+                  </div>
+                </div>
+              </Dialog.Panel>
             </div>
-            <div
-              className='flex w-full items-center flex-row gap-x-2 font-medium'
-            >
-              <div>
-                Product
-              </div>
-              <input
-                type="number"
-                onChange={(e) => setPriceObject({ ...priceObject, product: e.target.value })}
-                min="0"
-                className='p-1 w-full rounded-lg border border-gray-200 font-normal'
-              />
-            </div>
-            <div
-              className='flex w-full flex-row gap-x-2 justify-end'
-            >
-              <div
-                className="cursor-pointer font-medium rounded-md bg-white p-1"
-                onClick={() => setPriceToggle(!priceToggle)}
-              >
-                Exit
-              </div>
-              <button
-                disabled={!allowPriceSubmit}
-                className={classNames(
-                  "font-medium rounded-md p-1",
-                  allowPriceSubmit ? "cursor-pointer bg-green-200 hover:bg-green-300" : "text-gray-400 cursor-not-allowed bg-gray-200"
-                )
-                }
-                onClick={handlePricePublish}
-              >
-                Save price
-              </button>
-            </div>
-          </div>
+          </Dialog>
         )}
         <Menu.Items as="div" className="z-50 flex flex-col divide-y divide-gray-100 absolute mt-2 right-2 text-xs bg-white rounded-lg border border-gray-100">
           <Menu.Item
@@ -480,6 +353,8 @@ export default function MultipleSchedule() {
     const appService = appointment.appDetails.service
     const customerName = appointment.appDetails.firstname
     const customerTel = appointment.appDetails.telNo
+    const gridrow = (differenceInMinutes(appointment.appDetails.appStartTime, dayStart) / 20) + 1
+    const span = (differenceInMinutes(appointment.appDetails.appEndTime, appointment.appDetails.appStartTime) / 20)
     const isBreak = appointment.appDetails.service === "20 Minute Break" || appointment.appDetails.service === "40 Minute Break" || appointment.appDetails.service === "60 Minute Break"
     const priceExists = appointment.service ? true : false
     const tileColor = color ? color : "pink"
@@ -534,12 +409,25 @@ export default function MultipleSchedule() {
       console.log("Updated document ID:", appId);
     }
 
+    const numberInputOnWheelPreventChange = (e: React.WheelEvent<HTMLInputElement>) => {
+      // Prevent the input value change
+      e.target.blur()
+
+      // Prevent the page/container scrolling
+      e.stopPropagation()
+
+      // Refocus immediately, on the next tick
+      setTimeout(() => {
+        e.target.focus()
+      }, 0)
+    }
+
     return (
       <Menu
         as="div"
         className="z-0 relative flex flex-col gap-y-2"
       >
-        {!cancelToggle && !priceToggle && (
+        {!cancelToggle && (
           <Menu.Button as="div" className="flex ">
             <li
               key={appService + Math.random()}
@@ -641,57 +529,66 @@ export default function MultipleSchedule() {
           </div>
         )}
         {priceToggle && (
-          <div
-            className='items-start bg-gray-100 select-none group flex-1 flex flex-col gap-y-2 rounded-lg p-2 text-xs leading-5 overflow-auto'
+          <Dialog
+            as="div"
+            className="relative z-50"
+            onClose={() => setPriceToggle(false)}
+            open={priceToggle}
           >
-            <div
-              className='flex w-full items-center flex-row gap-x-2 font-medium'
-            >
-              <div>
-                Service
-              </div>
-              <input
-                type="number"
-                onChange={(e) => setPriceObject({ ...priceObject, service: e.target.value })}
-                min="0"
-                className='p-1 w-full rounded-lg border border-gray-200 font-normal'
-              />
+            <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+              <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-white">
+                <div className='flex flex-col gap-y-4 p-6'>
+                  <Dialog.Title className="text-lg font-medium">
+                    Enter Price Details
+                  </Dialog.Title>
+
+                  <div className='flex flex-col gap-y-4'>
+                    <div className='flex items-center gap-x-2'>
+                      <label className="font-medium">Service</label>
+                      <input
+                        type="number"
+                        onChange={(e) => setPriceObject({ ...priceObject, service: e.target.value })}
+                        onWheel={numberInputOnWheelPreventChange}
+                        min="0"
+                        className='p-2 w-full rounded-lg border border-gray-200'
+                      />
+                    </div>
+
+                    <div className='flex items-center gap-x-2'>
+                      <label className="font-medium">Product</label>
+                      <input
+                        type="number"
+                        onChange={(e) => setPriceObject({ ...priceObject, product: e.target.value })}
+                        onWheel={numberInputOnWheelPreventChange}
+                        min="0"
+                        className='p-2 w-full rounded-lg border border-gray-200'
+                      />
+                    </div>
+                  </div>
+
+                  <div className='flex justify-end gap-x-2 mt-2'>
+                    <button
+                      className="rounded-md bg-white px-3 py-2 text-sm font-semibold border hover:bg-gray-50"
+                      onClick={() => setPriceToggle(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      disabled={!allowPriceSubmit}
+                      className={classNames(
+                        "rounded-md px-3 py-2 text-sm font-semibold",
+                        allowPriceSubmit ? "bg-green-200 hover:bg-green-300" : "text-gray-400 cursor-not-allowed bg-gray-200"
+                      )}
+                      onClick={handlePricePublish}
+                    >
+                      Save price
+                    </button>
+                  </div>
+                </div>
+              </Dialog.Panel>
             </div>
-            <div
-              className='flex w-full items-center flex-row gap-x-2 font-medium'
-            >
-              <div>
-                Product
-              </div>
-              <input
-                type="number"
-                onChange={(e) => setPriceObject({ ...priceObject, product: e.target.value })}
-                min="0"
-                className='p-1 w-full rounded-lg border border-gray-200 font-normal'
-              />
-            </div>
-            <div
-              className='flex w-full flex-row gap-x-2 justify-end'
-            >
-              <div
-                className="cursor-pointer font-medium rounded-md bg-white p-1"
-                onClick={() => setPriceToggle(!priceToggle)}
-              >
-                Exit
-              </div>
-              <button
-                disabled={!allowPriceSubmit}
-                className={classNames(
-                  "font-medium rounded-md p-1",
-                  allowPriceSubmit ? "cursor-pointer bg-green-200 hover:bg-green-300" : "text-gray-400 cursor-not-allowed bg-gray-200"
-                )
-                }
-                onClick={handlePricePublish}
-              >
-                Save price
-              </button>
-            </div>
-          </div>
+          </Dialog>
         )}
         <Menu.Items as="div" className="z-50 flex flex-col divide-y divide-gray-100 absolute right-1 mt-1 text-xs bg-white rounded-lg border border-gray-100">
           <Menu.Item
@@ -735,7 +632,7 @@ export default function MultipleSchedule() {
     )
   }
 
-  const BarberItem = ({ keyValue, barber }: { keyValue: any, barber: object }) => {
+  const BarberItem = ({ keyValue, barber }: { keyValue: any, barber: User }) => {
     return (
       <div
         key={keyValue + Math.random()}
@@ -844,16 +741,16 @@ export default function MultipleSchedule() {
       </header>
 
       {/* Calendar */}
-      {workingBarbers.length === 0 ? (
-        <div
-          className='flex flex-row items-center justify-center text-sm p-2'
-        >
+      {isLoading ? (
+        <div className='flex flex-row items-center justify-center text-sm p-2'>
+          Loading calendar data...
+        </div>
+      ) : workingBarbers.length === 0 ? (
+        <div className='flex flex-row items-center justify-center text-sm p-2'>
           {`${view === "Team" ? "No barbers are" : "You are not"} working on this day. Roster work to add appointments.`}
         </div>
-      ) :
-        <div
-          className='flex flex-row h-20 flex-grow w-full items-start overflow-y-auto overflow-x-auto'
-        >
+      ) : (
+        <div className='flex flex-row h-20 flex-grow w-full items-start overflow-y-auto overflow-x-auto'>
           {/* Showcase of times */}
           <div className="sticky left-0 flex flex-col z-20 w-11 bg-white border-r border-gray-100">
             <div
@@ -975,7 +872,7 @@ export default function MultipleSchedule() {
             )
           })}
         </div>
-      }
+      )}
       </div>
 
   )

@@ -7,8 +7,21 @@ import { auth, db } from '../index.ts'
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { usePathname, useRouter } from "next/navigation.js";
 
+interface UserContextType {
+  createUser: (email: string, password: string) => Promise<any>;
+  user: any | null;
+  signUserOut: () => void;
+  userProfile: any | null;
+  userDocId: string | null;
+}
 
-const UserContext = createContext({});
+const UserContext = createContext<UserContextType>({
+  createUser: () => Promise.resolve(),
+  user: null,
+  signUserOut: () => {},
+  userProfile: null,
+  userDocId: null
+});
 
 export const AuthContextProvider = ({ children }: { children: React.ReactNode}) => {
   const router = useRouter();
@@ -21,7 +34,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode}) 
   
   // Sign a user out
   const signUserOut = () => {
-    console.log('signUserOut function called'); // Add this line
+    console.log('signUserOut function called'); 
       signOut(auth).then(() => {
           console.log('User signed out')
         }).catch((error) => {
@@ -35,16 +48,17 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode}) 
   // Listen for user state changes
   useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
-        console.log('onAuthStateChanged listener triggered', { user, pathName }); // Add this line
+        console.log('onAuthStateChanged listener triggered', { user, pathName }); 
           if (user) {
               setUser(user);
               console.log('User detected')
           } else {
               console.log('User not detected')
               setUser(null)
-              if (pathName !== '/login' && pathName !== '/signup' && pathName !== '/booking') {
-                router.push('/')
-              }
+              // Temporarily removed auth requirement
+              // if (pathName !== '/login' && pathName !== '/signup' && pathName !== '/booking' && pathName !== '/bookings') {
+              //   router.push('/')
+              // }
           }
       });
   
