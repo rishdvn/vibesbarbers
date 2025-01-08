@@ -48,13 +48,90 @@ const FormComponent = ({
         selectedTime: { start: null, end: null },
         appointmentsAlreadyBooked: [],
         roster: [],
-        availableDaysWithSlots: []
+        availableDaysWithSlots: [],
+        barbersAvailable: []
     });
     
     const [appointment, setAppointment] = useState<Form>(getInitialState);
     const [allowSubmit, setAllowSubmit] = useState(false);
     const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+    const [isLoadingBarbers, setIsLoadingBarbers] = useState(false);
     const appointmentsCache = useRef<{ [key: string]: any }>({});
+
+    useEffect(() => {
+        if (user) {
+            setAppointment(prevState => ({
+                ...prevState,
+                telNo: user.phoneNumber ? user.phoneNumber.replace(/^(\+61|0)/, '') : ""
+            }));
+        }
+    }, [user]);
+
+    const fetchAvailableBarbers = async () => {
+        if (!appointment.service) return;
+
+        setIsLoadingBarbers(true);
+        const availableBarbersFinal = [];
+        for (const user of users) {
+            // loop through each barber and check if they have a roster for the next two weeks
+            const roster = await fetchBarberNextTwoWeeksRosters(user.uid);
+            if (roster.length !== 0) {
+                const startRoster = new TZDate(new Date(), TIMEZONE);
+                const endRoster = new TZDate(new Date(), TIMEZONE);
+                endRoster.setDate(startRoster.getDate() + 14);
+
+                const availableDaysWithSlots = [];
+
+                // Check each day in the roster for available slots
+                for (const rosterItem of roster) {
+                    const rosterStart = new TZDate(rosterItem.selectedTimes.start, TIMEZONE);
+                    const rosterEnd = rosterItem.selectedTimes.end !== "Never" 
+                        ? new TZDate(rosterItem.selectedTimes.end, TIMEZONE) 
+                        : endRoster;
+
+                    let currentDay = new TZDate(Math.max(startRoster.getTime(), rosterStart.getTime()), TIMEZONE);
+                    const lastDay = new TZDate(Math.min(endRoster.getTime(), rosterEnd.getTime()), TIMEZONE);
+
+                    while (currentDay <= lastDay) {
+                        const dayName = format(currentDay, 'iiii').toLowerCase();
+                        if (rosterItem.selectedTimes[dayName].isWorking) {
+                            // Fetch appointments for this specific day using cache
+                            const appointments = await getCachedAppointments(user.uid, currentDay);
+                            
+                            const updatedAppointment = {
+                                ...appointment,
+                                appointmentsAlreadyBooked: appointments,
+                                roster: roster
+                            };
+
+                            const slots = findAvailableSlots(currentDay, updatedAppointment);
+                            if (slots.length > 0) {
+                                availableDaysWithSlots.push({
+                                    day: new TZDate(currentDay, TIMEZONE),
+                                    slots: slots
+                                });
+                            }
+                        }
+                        currentDay = new TZDate(currentDay.getTime() + 24 * 60 * 60 * 1000, TIMEZONE);
+                    }
+                }
+
+                if ( availableDaysWithSlots.length > 0 ) {
+                    availableBarbersFinal.push({ user , availableDaysWithSlots });
+                }
+            }
+        }
+
+        setAppointment(prev => ({
+            ...prev,
+            barbersAvailable: availableBarbersFinal
+        }));
+        setIsLoadingBarbers(false);
+    };
+
+    useEffect(() => {
+        fetchAvailableBarbers();
+    }, [appointment.service])
 
     const getCachedAppointments = async (barberId: string, day: TZDate) => {
         const dateKey = format(day, 'yyyy-MM-dd');
@@ -186,18 +263,23 @@ const FormComponent = ({
         }
     };
 
-    useEffect(() => {
-        if (appointment.service && appointment.barber) {
-            updateAvailableDaysWithSlots();
-        }
-    }, [appointment.service, appointment.barber]);
+    // useEffect(() => {
+    //     if (appointment.service && appointment.barber) {
+    //         updateAvailableDaysWithSlots();
+    //     }
+    // }, [appointment.service, appointment.barber]);
 
     const handleBarberChange = async (value: any) => {
-        const roster = await fetchBarberNextTwoWeeksRosters(value.uid);
+        const selectedBarberItem = appointment.barbersAvailable.filter(item => item.user && item.user.uid === value.uid);
+        const availableDaysWithSlots = selectedBarberItem[0].availableDaysWithSlots;
+        console.log("availableDaysWithSlots",availableDaysWithSlots)
+
+        // const roster = await fetchBarberNextTwoWeeksRosters(value.uid);
         setAppointment(prevState => ({
             ...prevState,
             barber: value.uid,
-            roster: roster,
+            // roster: roster,
+            availableDaysWithSlots,
             dates: [],
             appointmentsAlreadyBooked: [],
             selectedDay: null,
@@ -247,14 +329,22 @@ const FormComponent = ({
 
     async function handleServiceChange(service: string) {
         setAppointment(prevState => {
-            const updatedAppointment : Form = { ...prevState, service};
+            const updatedAppointment : Form = { 
+                ...prevState, 
+                service, 
+                // selectedDay: null,
+                selectedTime: { start: null, end: null },
+            };
             if (appointment.roster && appointment.selectedDay) {
                 const availableTimes = findAvailableSlots(appointment.selectedDay, updatedAppointment);
+                console.log("availableTimes", availableTimes)
                 return { ...updatedAppointment, avaliableTimes: availableTimes };
             }
             return updatedAppointment
         });
     }
+
+    console.log('appointment', appointment);
 
     async function publishToAppointments(appDetails: Appointment) {
         try {
@@ -291,7 +381,12 @@ const FormComponent = ({
         
             <Service service={appointment.service} onChange={(service) => handleServiceChange(service)} services={services}/>
             
-            <Barber users={users} barber={appointment.barber} handleBarberChange={handleBarberChange}/>
+            <Barber 
+                users={appointment.barbersAvailable} 
+                barber={appointment.barber} 
+                handleBarberChange={handleBarberChange}
+                isLoading={isLoadingBarbers}
+            />
             
             {appointment.barber && !appointment.service && (
                 <p className="text-red-500 mt-2 text-xl">Please select a service</p>
@@ -305,12 +400,12 @@ const FormComponent = ({
                 isLoading={isLoadingSlots}
             />}
 
-            {(appointment.roster && appointment.selectedDay) && <AppointmentTime 
+            {(appointment.roster && appointment.selectedDay) && <AppointmentTime
                 availableTimes={appointment.availableTimes} 
                 selectedTime={appointment.selectedTime} 
                 handleTimeChange={handleTimeChange}
                 isLoading={isLoadingSlots}
-            />} 
+            />}
 
             {(appointment.selectedTime.start && appointment.selectedTime.end) && 
             <>
@@ -322,12 +417,12 @@ const FormComponent = ({
                     lastname: newValue.lastname
                 }))}
             />
-            {/* <PhoneNumber 
+            <PhoneNumber 
                 user={user} 
                 appDetails={appointment} 
                 handleAppDetails={e => {setAppointment(prev => ({...prev, telNo: e.target.value}))}} 
                 signUserOut={signUserOut} 
-            /> */}
+            />
             <BookButton 
                 allowSubmit={Boolean(appointment.selectedTime.start && appointment.selectedTime.end && appointment.firstname && appointment.lastname && appointment.telNo)}
                 onSubmit={handleSubmit}

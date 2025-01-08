@@ -10,6 +10,9 @@ import { TZDate } from "@date-fns/tz";
 
 const TIMEZONE = 'Australia/Sydney'; // Define the timezone
 
+
+
+
 export async function fetchBarbers(): Promise<User[]> {
     const usersSnapshot = await getDocs(collection(db, "users"));
     const users: User[] = [];
@@ -40,8 +43,6 @@ export async function getBarberById(barberId: string): Promise<User | null> {
 
   return null;
 }
-
-
 
 export async function fetchRosters(): Promise<RosterCollection> {
   const rostersSnapshot = await getDocs(collection(db, "roster"));

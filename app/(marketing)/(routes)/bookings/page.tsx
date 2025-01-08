@@ -98,10 +98,13 @@ export default function BookingsPage() {
             <img 
               src="/black_logo_vibes.png" 
               alt="Vibes Barbers Logo" 
-              className="h-8 w-auto invert filter contrast-125 brightness-90"
+              className="h-[60px] w-auto invert filter contrast-125 brightness-90"
             />
           </Link>
-          <span className="text-xl font-bold text-white">VIBES BARBERS</span>
+          {/* <div className='flex flex-col gap-y-0'>
+            <span className="tracking-tigher font-serif text-xl font-light text-white">VIBES</span>
+            <span className="tracking-tigher font-serif text-xl font-light text-white">BARBERS</span>
+          </div> */}
         </div>
         <button 
           onClick={() => auth.signOut()}
@@ -113,7 +116,7 @@ export default function BookingsPage() {
       </nav>
 
       {/* Title */}
-      <h1 className="text-4xl mt-4 font-serif mb-4 text-white">BOOKINGS</h1>
+      <h1 className="tracking-tight font-light text-5xl mt-4 font-serif mb-4 text-white">BOOKINGS</h1>
 
       {/* Tabs */}
       <Tabs defaultValue="upcoming" className="w-full">

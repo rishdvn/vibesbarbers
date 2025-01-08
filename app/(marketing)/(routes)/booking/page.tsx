@@ -85,15 +85,15 @@ const BookingPage = () => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-    onSnapshot(collection(db, "users"), (querySnapshot) => {
-        const usersFetched = [];
-        querySnapshot.forEach((doc) => {
-        if (doc.data().approved === true && (doc.data().role === 'Barber' || doc.data().role === 'Admin')){
-            usersFetched.push(doc.data());
-        }      
-        });
-        setUsers(usersFetched);
-    })
+      onSnapshot(collection(db, "users"), (querySnapshot) => {
+          const usersFetched = [];
+          querySnapshot.forEach((doc) => {
+          if (doc.data().approved === true && (doc.data().role === 'Barber' || doc.data().role === 'Admin')){
+              usersFetched.push(doc.data());
+          }      
+          });
+          setUsers(usersFetched);
+      })
     },[])
 
   // fetch all rosters
@@ -113,17 +113,17 @@ const BookingPage = () => {
   // fetch existing appointments
   const [appointments, setAppointments] = useState([]);
 
-    // initialize appDetials object
-    const [appDetails, setAppDetails] = useState({
-      service: "",
-      barberUID: "",
-      firstname: "",
-      telNo: "",
-      appDay: "",
-      appStartTime: "",
-      appEndTime: "",
-      isExtra: false
-    });
+  // initialize appDetials object
+  const [appDetails, setAppDetails] = useState({
+    service: "",
+    barberUID: "",
+    firstname: "",
+    telNo: "",
+    appDay: "",
+    appStartTime: "",
+    appEndTime: "",
+    isExtra: false
+  });
   
   useEffect(() => {
     onSnapshot(collection(db, "appointments"), (querySnapshot) => {
