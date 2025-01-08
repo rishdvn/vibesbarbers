@@ -174,6 +174,7 @@ const FormComponent = ({
         const selectedDay = new TZDate(day, TIMEZONE);
         const appointmentsAlreadyBooked: Appointment[] = appointment.appointmentsAlreadyBooked;
         const serviceDuration = services[appointment.service];
+        console.log('serviceDuration', serviceDuration)
         const dayName = format(selectedDay, 'iiii').toLowerCase() as 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
         
         console.log('determing selectedRoster...')
@@ -219,15 +220,30 @@ const FormComponent = ({
 
         while (currentTime < endOfDay) {
             const serviceEndTime = new TZDate(currentTime.getTime() + serviceDuration * 60000, TIMEZONE);
+            console.log('serviceEndTime',serviceEndTime)
             
             if (serviceEndTime <= endOfDay && currentTime > currentAESTTime) {
                 const isSlotAvailable = !appointmentsAlreadyBooked.some(app => {
+                    console.log("determining if Slot is available")
+                    console.log("currentTime", currentTime)
+                    console.log("serviceEndTime", serviceEndTime)
                     const appStartTime = new TZDate(app.appStartTime as Date, TIMEZONE);
+                    console.log("app.appStartTime as Date", app.appStartTime as Date)
+                    console.log("app.appStartTime as Date with TZ", new TZDate(app.appStartTime as Date, TIMEZONE))
                     const appEndTime = new TZDate(app.appEndTime as Date, TIMEZONE);
+                    console.log("app.appEndTime as Date", app.appEndTime as Date)
+                    console.log("app.appEndTime as Date with TZ", new TZDate(app.appEndTime as Date, TIMEZONE))
+                    console.log("currentTime >= appStartTime && currentTime < appEndTime", currentTime >= appStartTime && currentTime < appEndTime)
+                    console.log("(serviceEndTime > appStartTime && serviceEndTime <= appEndTime)", (serviceEndTime > appStartTime && serviceEndTime <= appEndTime))
+                    console.log("(currentTime <= appStartTime && serviceEndTime >= appEndTime)", (currentTime <= appStartTime && serviceEndTime >= appEndTime))
                     return (currentTime >= appStartTime && currentTime < appEndTime) || 
                            (serviceEndTime > appStartTime && serviceEndTime <= appEndTime) ||
                            (currentTime <= appStartTime && serviceEndTime >= appEndTime);
                 });
+
+                console.log(isSlotAvailable)
+                console.log(currentTime)
+                console.log(serviceEndTime)
 
                 if (isSlotAvailable) {
                     availableSlots.push({
@@ -238,6 +254,8 @@ const FormComponent = ({
             }
             currentTime = new TZDate(currentTime.getTime() + SLOT_TIME * 60000, TIMEZONE);
         }
+
+        console.log('availableSlots', availableSlots);
 
         return availableSlots;
     }
