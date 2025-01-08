@@ -90,6 +90,11 @@ const BarberLanding = () => {
                   </button>
                 </Link>
               )} */}
+              <Link href="/booking">
+                <button className="bg-white text-black px-8 py-3 rounded-md font-bold hover:bg-gray-200 transition-colors ml-4">
+                  MAKE BOOKING
+                </button>
+              </Link>
             </div>
 
             {/* Reviews */}
