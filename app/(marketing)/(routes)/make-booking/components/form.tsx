@@ -79,31 +79,45 @@ const FormComponent = ({
             // loop through each barber and check if they have a roster for the next two weeks
             const roster = await fetchBarberNextTwoWeeksRosters(user.uid);
             if (roster.length !== 0) {
+                console.log("roster", roster)
                 const startRoster = new TZDate(new Date(), TIMEZONE);
+                console.log("startRoster", startRoster)
                 const endRoster = new TZDate(new Date(), TIMEZONE);
+                console.log("endRoster", endRoster)
                 endRoster.setDate(startRoster.getDate() + 14);
+                console.log("endRoster after adding 14 days", endRoster)
 
                 const availableDaysWithSlots = [];
 
                 // Check each day in the roster for available slots
                 for (const rosterItem of roster) {
-                    console.log("rosterItem", rosterItem)
+                    console.log("rosterItem when looping through items", rosterItem)
                     console.log("rosterItem.selectedTimes", rosterItem.selectedTimes)
-                    console.log("rosterStart", rosterItem.selectedTimes.start)
-                    console.log("rosterStart", new TZDate(rosterItem.selectedTimes.start, TIMEZONE))
+                    console.log("rosterStart as is", rosterItem.selectedTimes.start)
+                    console.log("rosterStart TZDate", new TZDate(rosterItem.selectedTimes.start, TIMEZONE))
                     const rosterStart = new TZDate(rosterItem.selectedTimes.start, TIMEZONE);
                     const rosterEnd = rosterItem.selectedTimes.end !== "Never" 
                         ? new TZDate(rosterItem.selectedTimes.end, TIMEZONE) 
                         : endRoster;
+                    console.log("rosterEnd", rosterEnd)
+
+
+                    console.log("finding current date")
+                    console.log(startRoster.getTime())
+                    console.log(rosterStart.getTime())
 
                     let currentDay = new TZDate(Math.max(startRoster.getTime(), rosterStart.getTime()), TIMEZONE);
+                    console.log(currentDay)
                     const lastDay = new TZDate(Math.min(endRoster.getTime(), rosterEnd.getTime()), TIMEZONE);
+                    console.log(lastDay)
 
                     while (currentDay <= lastDay) {
                         const dayName = format(currentDay, 'iiii').toLowerCase();
+                        console.log("dayName from currentDay", dayName)
                         if (rosterItem.selectedTimes[dayName].isWorking) {
                             // Fetch appointments for this specific day using cache
                             const appointments = await getCachedAppointments(user.uid, currentDay);
+                            console.log("appointments for specific day", appointments)
                             
                             const updatedAppointment = {
                                 ...appointment,
@@ -111,6 +125,7 @@ const FormComponent = ({
                                 roster: roster
                             };
 
+                            console.log("running findAvailableSlots NOW!!")
                             const slots = findAvailableSlots(currentDay, updatedAppointment);
                             if (slots.length > 0) {
                                 availableDaysWithSlots.push({
@@ -161,16 +176,28 @@ const FormComponent = ({
         const serviceDuration = services[appointment.service];
         const dayName = format(selectedDay, 'iiii').toLowerCase() as 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
         
+        console.log('determing selectedRoster...')
         const selectedRoster = appointment.roster.find(roster => {
             const rosterStart = new TZDate(roster.selectedTimes.start, TIMEZONE);
+            console.log('rosterStart without TZDate', roster.selectedTimes.start)
+            console.log('rosterStart with TZDate', rosterStart)
             const rosterEnd = roster.selectedTimes.end !== "Never" ? new TZDate(roster.selectedTimes.end, TIMEZONE) : null;
+            console.log('rosterEnd without TZDate', roster.selectedTimes.end)
+            console.log('rosterStart with TZDate', rosterEnd)
+            console.log('return', selectedDay >= rosterStart && (!rosterEnd || selectedDay <= rosterEnd))
             return (selectedDay >= rosterStart && (!rosterEnd || selectedDay <= rosterEnd));
         });
 
+        console.log('selectedRoster', selectedRoster)
+
+        console.log('gettingDayBoundary now...')
         const getDayBoundary = (boundaryType: 'start' | 'end') => {
             if (selectedRoster) {
                 const time = selectedRoster.selectedTimes[dayName][`${boundaryType}_time`];
+                console.log('time', time)
                 const hour = time.period === 'AM' ? parseInt(time.hour) : parseInt(time.hour) + 12;
+                console.log('hour', hour)
+                console.log("return with TZ", TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), hour, parseInt(time.min), 0, 0))
                 return TZDate.tz(TIMEZONE, selectedDay.getFullYear(), selectedDay.getMonth(), selectedDay.getDate(), hour, parseInt(time.min), 0, 0);
             } else {
                 const [hours, minutes] = DEFAULT_BUSINESS_HOURS[dayName][`${boundaryType}Time`].split(':');
@@ -182,9 +209,13 @@ const FormComponent = ({
         const endOfDay = getDayBoundary('end');
 
         const availableSlots = [];
+        console.log(startOfDay)
+        console.log(endOfDay)
         let currentTime = startOfDay;
         
         const currentAESTTime = TZDate.tz(TIMEZONE, new Date());
+        console.log("currentAESTTime without TZ", new Date())
+        console.log("currentAESTTime", TZDate.tz(TIMEZONE, new Date()))
 
         while (currentTime < endOfDay) {
             const serviceEndTime = new TZDate(currentTime.getTime() + serviceDuration * 60000, TIMEZONE);
