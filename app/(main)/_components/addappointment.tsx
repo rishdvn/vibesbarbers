@@ -256,7 +256,7 @@ export default function AddAppointment({flyOverOpen, setFlyOverOpen, user}:{flyO
                 let overlapExists = false;
                 for (let app of barberExistingApps) {
                   if (!app.appDetails.isExtra) {
-                    if (app.appDetails.appStartTime) {
+                    if (app.appDetails.appStartTime && typeof app.appDetails.appStartTime === "object") {
                       const existingStartTime = app.appDetails.appStartTime.toDate();
                       const existingEndTime = app.appDetails.appEndTime.toDate();
                       if (areIntervalsOverlapping({start: appStartTime, end: appEndTime},{start: existingStartTime, end: existingEndTime})) {

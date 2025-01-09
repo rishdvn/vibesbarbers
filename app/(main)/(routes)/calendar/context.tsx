@@ -118,8 +118,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
 
       const q = query(
         collection(db, "appointments"),
-        where("appDetails.appStartTime", ">=", dayStart),
-        where("appDetails.appStartTime", "<=", dayEnd)
+        where("appDetails.appDay", "==", dayStart)
       );
 
       const unsubscribe = onSnapshot(q, {
@@ -155,6 +154,8 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     }
   }, [selectedDay]);
 
+  console.log(appointments)
+
   // Fetch rosters
   useEffect(() => {
     setIsLoading(true);
@@ -186,13 +187,17 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     return appointments.filter(app => {
       const appStartTime = ensureDate(app.appDetails.appStartTime);
       const appDay = ensureDate(app.appDetails.appDay);
-      
+
       if (app.appDetails.isExtra) {
         return new Date(appDay).getDate() === new Date(selectedDay).getDate();
       }
       return new Date(appStartTime).getDate() === new Date(selectedDay).getDate();
     });
   }, [appointments, selectedDay]);
+
+  const extraApps = useMemo(() => {
+    return appointments.filter(app => app.appDetails.isExtra);
+  }, [appointments,selectedDay])
 
   // Create a map of appointments organized by time and barber
   const timeAppointmentBarberMap = useMemo(() => {

@@ -77,7 +77,6 @@ const BarberLanding = () => {
             {/* Tagline and CTA */}
             <div className="text-center">
               <p className="text-xl mb-6">Where passion meets quality</p>
-              The site is currently under construction. Please check back later.
               {/* <Link href={user ? "/make-booking" : "/login"}>
                 <button className="bg-white text-black px-8 py-3 rounded-md font-bold hover:bg-gray-200 transition-colors">
                   BOOK NOW

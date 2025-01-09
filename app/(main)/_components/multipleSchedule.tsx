@@ -60,6 +60,7 @@ export default function MultipleSchedule() {
     for (let app of appointments) {
       // if isExtra is set to true, filter based on appDay
       if (app.appDetails.isExtra) {
+        console.log("isExtra", app)
         if (isSameDay(app.appDetails.appDay.toDate(), selectedDay)) {
           tempApps.push(app)
         }
