@@ -348,7 +348,7 @@ const BookingPage = () => {
                 // check for overlap between any existing appointments/lunch breaks
                 let overlapExists = false;
                 for (let app of barberExistingApps) {
-                  if (!app.appDetails.isExtra) {
+                  if (!app.appDetails.isExtra && app.appDetails.appStartTime) {
                     const existingStartTime = app.appDetails.appStartTime.toDate();
                     const existingEndTime = app.appDetails.appEndTime.toDate();
                     if (areIntervalsOverlapping({start: appStartTime, end: appEndTime},{start: existingStartTime, end: existingEndTime})) {
@@ -372,7 +372,7 @@ const BookingPage = () => {
                   // check for overlap between any existing appointments/lunch breaks
                   let overlapExists = false;
                   for (let app of barberExistingApps) {
-                    if (!app.appDetails.isExtra) {
+                    if (!app.appDetails.isExtra && app.appDetails.appStartTime) {
                       const existingStartTime = app.appDetails.appStartTime.toDate();
                       const existingEndTime = app.appDetails.appEndTime.toDate();
                       if (areIntervalsOverlapping({start: appStartTime, end: appEndTime},{start: existingStartTime, end: existingEndTime})) {
