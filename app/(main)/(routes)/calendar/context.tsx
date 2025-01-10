@@ -23,6 +23,7 @@ interface CalendarContextType {
   setSelectedDay: (day: Date) => void;
   barbers: User[];
   appointments: AppointmentDoc[];
+  mergedApps: AppointmentDoc[];
   rosters: Record<string, Roster>;
   selectedDayAppointments: AppointmentDoc[];
   workingBarbers: User[];
@@ -48,6 +49,8 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   const [selectedDay, setSelectedDay] = useState<Date>(today);
   const [barbers, setBarbers] = useState<User[]>([]);
   const [appointments, setAppointments] = useState<AppointmentDoc[]>([]);
+  const [appointmentsWhere, setAppointmentsWhere] = useState<AppointmentDoc[]>([]);
+  const [mergedApps, setMergedApps] = useState<AppointmentDoc[]>([]);
   const [rosters, setRosters] = useState<Record<string, Roster>>({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -154,8 +157,80 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     }
   }, [selectedDay]);
 
-  console.log(appointments)
+   // Fetch appointments for selected day
+   useEffect(() => {
+    setIsLoading(true);
+    try {
+      // Create start and end of selected day
+      const dayStart = new Date(selectedDay);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(selectedDay);
+      dayEnd.setHours(23, 59, 59, 999);
 
+      const q = query(
+        collection(db, "appointments"),
+        where("appDetails.appStartTime", ">=", dayStart),
+        where("appDetails.appStartTime", "<=", dayEnd)
+      );
+
+      const unsubscribe = onSnapshot(q, {
+        next: (snapshot) => {
+          const appointmentsList = snapshot.docs.map(doc => {
+            const data = doc.data();
+            const appDetails = data.appDetails || {};
+            
+            return {
+              id: doc.id,
+              ...data,
+              appDetails: {
+                ...appDetails,
+                appStartTime: ensureDate(appDetails.appStartTime),
+                appEndTime: ensureDate(appDetails.appEndTime),
+                appDay: ensureDate(appDetails.appDay)
+              }
+            } as AppointmentDoc;
+          });
+          setAppointmentsWhere(appointmentsList);
+          setIsLoading(false);
+        },
+        error: (error) => {
+          console.error("Error fetching appointments:", error);
+          setIsLoading(false);
+        }
+      });
+
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("Error setting up appointments listener:", error);
+      setIsLoading(false);
+    }
+  }, [selectedDay]);
+
+  useEffect(() => {
+    // Function to merge two arrays and remove duplicates by id
+    const mergeArraysById = (array1: Appointment[], array2: Appointment[]): Appointment[] => {
+      const mergedMap = new Map<string, Appointment>();
+
+      // Add all objects from the first array
+      array1.forEach(item => mergedMap.set(item.id, item));
+
+      // Add all objects from the second array (overwriting duplicates)
+      array2.forEach(item => mergedMap.set(item.id, item));
+
+      // Convert the Map values back to an array
+      return Array.from(mergedMap.values());
+    };
+
+    const mergedApps = mergeArraysById(appointments, appointmentsWhere);
+
+    setMergedApps(mergedApps);
+
+  }, [appointments, appointmentsWhere])
+
+  console.log("appointments", appointments)
+  console.log("appointmentsWhere", appointmentsWhere)
+  console.log("mergedApps", mergedApps)
+  
   // Fetch rosters
   useEffect(() => {
     setIsLoading(true);
@@ -183,8 +258,20 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Derived state: Selected day appointments
+  // const selectedDayAppointments = useMemo(() => {
+  //   return appointments.filter(app => {
+  //     const appStartTime = ensureDate(app.appDetails.appStartTime);
+  //     const appDay = ensureDate(app.appDetails.appDay);
+
+  //     if (app.appDetails.isExtra) {
+  //       return new Date(appDay).getDate() === new Date(selectedDay).getDate();
+  //     }
+  //     return new Date(appStartTime).getDate() === new Date(selectedDay).getDate();
+  //   });
+  // }, [appointments, selectedDay]);
+
   const selectedDayAppointments = useMemo(() => {
-    return appointments.filter(app => {
+    return mergedApps.filter(app => {
       const appStartTime = ensureDate(app.appDetails.appStartTime);
       const appDay = ensureDate(app.appDetails.appDay);
 
@@ -193,11 +280,9 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       }
       return new Date(appStartTime).getDate() === new Date(selectedDay).getDate();
     });
-  }, [appointments, selectedDay]);
+  }, [mergedApps, selectedDay]);
 
-  const extraApps = useMemo(() => {
-    return appointments.filter(app => app.appDetails.isExtra);
-  }, [appointments,selectedDay])
+
 
   // Create a map of appointments organized by time and barber
   const timeAppointmentBarberMap = useMemo(() => {
