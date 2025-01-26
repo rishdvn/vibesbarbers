@@ -162,7 +162,7 @@ export default function BookingsPage() {
 
       {/* Make a Booking Button */}
       <Link 
-        href="/make-booking" 
+        href="/booking" 
         className="block w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium text-center mt-6"
       >
         MAKE A BOOKING
