@@ -22,6 +22,14 @@ const BookingPage = () => {
 
   const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+  if (TimeZone !== "Australia/Melbourne") {
+    return (
+      <div>
+        <h1>Sorry, this service is only available in Melbourne</h1>
+      </div>
+    )
+  }
+
   const { user, signUserOut } = useUserAuth();
 
   const handleNumberChange = () => {
