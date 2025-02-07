@@ -22,14 +22,16 @@ const BookingPage = () => {
 
   const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  if (TimeZone !== "Australia/Melbourne") {
+  const validTimezones = ["Australia/Melbourne", "Australia/Sydney"];
+  
+  if (!validTimezones.includes(TimeZone)) {
     return (
       <div className="h-screen flex flex-col items-center justify-center px-4 text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
           Location Restricted
         </h1>
         <p className="text-gray-600 max-w-md">
-          Sorry, this booking service is currently only available in Melbourne, Australia. Please ensure you're in the correct timezone to make a booking.
+          Sorry, this booking service is currently only available in Melbourne and Sydney, Australia. Please ensure you're in the correct timezone to make a booking.
         </p>
       </div>
     )
