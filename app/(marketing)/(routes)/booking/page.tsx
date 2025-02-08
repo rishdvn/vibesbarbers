@@ -22,9 +22,18 @@ const BookingPage = () => {
 
   const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const validTimezones = ["Australia/Melbourne", "Australia/Sydney"];
+  const validTimezones = [
+    "Australia/Melbourne",
+    "Australia/Sydney",
+    "Australia/Victoria",  // Alternative format some systems use
+    "Australia/NSW",       // Alternative format some systems use
+    "GMT+10",             // Generic AEST format
+    "GMT+11",             // AEDT during daylight savings
+    "+10:00",             // Another common format
+    "+11:00"              // Another common format during DST
+  ];
   
-  if (!validTimezones.includes(TimeZone)) {
+  if (TimeZone && !validTimezones.some(tz => TimeZone.includes(tz))) {
     return (
       <div className="h-screen flex flex-col items-center justify-center px-4 text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
