@@ -89,11 +89,14 @@ const BarberLanding = () => {
                   </button>
                 </Link>
               )} */}
-              <Link href="/booking">
+              {/* <Link href="/booking">
                 <button className="bg-white text-black px-8 py-3 rounded-md font-bold hover:bg-gray-200 transition-colors ml-4">
                   MAKE BOOKING
                 </button>
-              </Link>
+              </Link> */}
+              <div>
+                The site is under construction. Please check back soon. 
+              </div>
             </div>
 
             {/* Reviews */}

@@ -32,6 +32,12 @@ const BookingPage = () => {
     "+10:00",             // Another common format
     "+11:00"              // Another common format during DST
   ];
+
+  return (
+    <div>
+      The site is under construction. Please check back soon. 
+    </div>
+  )
   
   if (TimeZone && !validTimezones.some(tz => TimeZone.includes(tz))) {
     return (
